@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import client from '@/app/lib/client';
 
-export default function LoginPage() {
+// 카카오 로그인 콜백을 처리하는 컴포넌트
+function KakaoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
@@ -27,6 +28,11 @@ export default function LoginPage() {
     }
   }, [code, router]);
 
+  return null;
+}
+
+// 로그인 버튼 컴포넌트
+function LoginButton() {
   const handleKakaoLogin = async () => {
     try {
       const { data, error } = await client.GET('/api/v1/auth/kakao/login', {});
@@ -44,15 +50,25 @@ export default function LoginPage() {
   };
 
   return (
+    <button
+      onClick={handleKakaoLogin}
+      className="w-full bg-yellow-300 text-black py-2 px-4 rounded-md hover:bg-yellow-400 transition-colors"
+    >
+      카카오로 로그인
+    </button>
+  );
+}
+
+// 메인 로그인 페이지 컴포넌트
+export default function LoginPage() {
+  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold text-center mb-6">로그인</h1>
-        <button
-          onClick={handleKakaoLogin}
-          className="w-full bg-yellow-300 text-black py-2 px-4 rounded-md hover:bg-yellow-400 transition-colors"
-        >
-          카카오로 로그인
-        </button>
+        <Suspense fallback={<div>Loading...</div>}>
+          <KakaoCallback />
+        </Suspense>
+        <LoginButton />
       </div>
     </div>
   );
