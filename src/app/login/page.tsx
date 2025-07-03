@@ -1,37 +1,39 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import client from '@/app/lib/client';
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import client from "@/app/lib/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get('code');
+  const code = searchParams.get("code");
 
   useEffect(() => {
     // 카카오 로그인 콜백으로 돌아왔을 때
     if (code) {
-      client.GET('/api/v1/auth/kakao/callback', {
-        params: { query: { code } }
-      }).then(({ data, error }) => {
-        if (error) {
-          console.error('Login failed:', error);
-          return;
-        }
-        if (data) {
-          // 로그인 성공 시 메인 페이지로 리다이렉트
-          router.push('/');
-        }
-      });
+      client
+        .GET("/api/v1/auth/kakao/callback", {
+          params: { query: { code } },
+        })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error("Login failed:", error);
+            return;
+          }
+          if (data) {
+            // 로그인 성공 시 메인 페이지로 리다이렉트
+            router.push("/");
+          }
+        });
     }
   }, [code, router]);
 
   const handleKakaoLogin = async () => {
     try {
-      const { data, error } = await client.GET('/api/v1/auth/kakao/login', {});
+      const { data, error } = await client.GET("/api/v1/auth/kakao/login", {});
       if (error) {
-        console.error('Failed to get login URL:', error);
+        console.error("Failed to get login URL:", error);
         return;
       }
       if (data?.authorization_url) {
@@ -39,7 +41,7 @@ export default function LoginPage() {
         window.location.href = data.authorization_url;
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     }
   };
 
