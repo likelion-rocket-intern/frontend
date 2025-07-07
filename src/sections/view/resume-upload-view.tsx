@@ -12,7 +12,9 @@ import { useRef, useState } from "react";
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
   const [additional, setAdditional] = useState<string>(""); // 추가 정보 input 상태관리
-  const withoutSpaces = additional.replace(/\s/g, ""); // 공백 제거 후 길이
+  const withoutSpaces = additional.replace(/\s/g, ""); // 공백 제거
+  const [manualResume, setManualResume] = useState<string>(""); // 이력서 직접 작성 input
+  const withoutSpacesManual = manualResume.replace(/\s/g, ""); // 직접 작성란 공백 제거
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -32,7 +34,7 @@ export default function ResumeUploadView() {
           <article className="mb-20">
             <div className="flex justify-between mb-8">
               <h1 className="text-[32px] text-[#777777]">
-                이력서를 입력해주세요
+                이력서를 업로드해주세요
               </h1>
               <Button
                 type="button"
@@ -66,7 +68,9 @@ export default function ResumeUploadView() {
 
           {/* 추가 내용 작성 섹션 */}
           <article className="space-y-8">
-            <h1 className="text-[32px] text-[#777777]">추가 내용 작성하기</h1>
+            <h1 className="text-[32px] text-[#777777]">
+              추가 내용을 작성해주세요
+            </h1>
             <div>
               <Textarea
                 className="min-h-[268px] mb-2"
@@ -77,7 +81,21 @@ export default function ResumeUploadView() {
             </div>
           </article>
         </TabsContent>
-        <TabsContent value="manual">Change your password here.</TabsContent>
+        <TabsContent value="manual">
+          <article className="space-y-8">
+            <h1 className="text-[32px] text-[#777777]">
+              이력서를 작성해주세요
+            </h1>
+            <div>
+              <Textarea
+                className="min-h-[268px] mb-2"
+                onChange={(e) => setManualResume(e.target.value)}
+                value={manualResume}
+              />
+              <p className="text-right text-xs text-[#767676]">{`총 글자수 ${manualResume.length}자 / 공백제외 ${withoutSpacesManual.length}자`}</p>
+            </div>
+          </article>
+        </TabsContent>
       </Tabs>
 
       <section className="flex w-full justify-around space-x-6 *:flex-1 *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
