@@ -34,7 +34,6 @@ const ResumeUploadSchema = zod.object({
     .refine((file) => file.size <= 5 * 1024 * 1024, {
       message: "파일 크기는 최대 5MB까지 허용됩니다.",
     }),
-  additional: zod.string(),
   manualResume: zod.string(),
 });
 
@@ -50,7 +49,6 @@ export default function ResumeUploadView() {
   // form 관리
   const defaultValues = {
     file: undefined,
-    additional: "",
     manualResume: "",
   };
 
@@ -69,9 +67,6 @@ export default function ResumeUploadView() {
   } = methods;
 
   const values = watch();
-  console.log(values);
-  const additional = values.additional;
-  const withoutSpaces = additional.replace(/\s/g, ""); // 공백 제거
   const manualResume = values.manualResume;
   const withoutSpacesManual = manualResume.replace(/\s/g, ""); // 직접 작성란 공백 제거
 
@@ -83,7 +78,7 @@ export default function ResumeUploadView() {
   const renderUploadTab = (
     <TabsContent value="upload">
       {/* 이력서 업로드 섹션 */}
-      <section className="mb-20">
+      <section>
         <div className="flex justify-between mb-8">
           <h1 className="text-[32px] text-[#777777]">
             이력서를 업로드해주세요
@@ -145,27 +140,6 @@ export default function ResumeUploadView() {
           )}
         />
       </section>
-
-      {/* 추가 내용 작성 섹션 */}
-      <section className="space-y-8">
-        <h1 className="text-[32px] text-[#777777]">추가 내용을 작성해주세요</h1>
-        <div>
-          <FormField
-            control={methods.control}
-            name="additional"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea className="min-h-[268px] mb-2" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <p className="text-right text-xs text-[#767676]">{`총 글자수 ${additional.length}자 / 공백제외 ${withoutSpaces.length}자`}</p>
-        </div>
-      </section>
     </TabsContent>
   );
 
@@ -223,9 +197,9 @@ export default function ResumeUploadView() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="공통 모달"
+        title="이력서 분석"
       >
-        <p className="mb-4">여기에 모달 내용이 들어갑니다.</p>
+        <p className="mb-4">이력서를 분석중입니다.</p>
       </Modal>
     </div>
   );
