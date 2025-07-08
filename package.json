@@ -10,7 +10,15 @@
     "update-schema": "openapi-typescript https://api.example.com/openapi.json -o src/schema.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@headlessui/react": "^2.2.4",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.1.1",
+    "@mui/material": "^7.2.0",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
     "class-variance-authority": "^0.7.1",
@@ -19,8 +27,9 @@
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.59.0",
-    "tailwind-merge": "^3.3.1"
+    "react-hook-form": "^7.60.0",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^3.25.74"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
