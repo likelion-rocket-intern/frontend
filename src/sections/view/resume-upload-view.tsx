@@ -19,11 +19,14 @@ import {
 
 import { SvgColor } from "@/components/svg-color";
 import { useRef, useState } from "react";
+import clsx from "clsx";
 
 type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
 const ResumeUploadSchema = zod.object({
-  fileName: zod.string().min(1, { message: "이력서 파일을 업로드해주세요." }),
+  file: zod
+    .instanceof(File, { message: "파일을 선택해주세요." })
+    .refine((file) => file.size > 0, { message: "파일이 비어있습니다." }),
   additional: zod.string(),
   manualResume: zod.string(),
 });
@@ -38,7 +41,7 @@ export default function ResumeUploadView() {
 
   // form 관리
   const defaultValues = {
-    fileName: "",
+    file: undefined,
     additional: "",
     manualResume: "",
   };
@@ -58,6 +61,7 @@ export default function ResumeUploadView() {
   } = methods;
 
   const values = watch();
+  console.log(values);
   const additional = values.additional;
   const withoutSpaces = additional.replace(/\s/g, ""); // 공백 제거
   const manualResume = values.manualResume;
@@ -87,7 +91,7 @@ export default function ResumeUploadView() {
 
         <FormField
           control={methods.control}
-          name="fileName"
+          name="file"
           render={({ field }) => (
             <FormItem>
               <FormControl>
@@ -101,14 +105,23 @@ export default function ResumeUploadView() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        field.onChange(file.name); // 파일명만 저장
+                        field.onChange(file);
                       }
                     }}
                   />
                   <Label htmlFor="resumeUpload" className="block w-full">
-                    <div className="flex flex-col justify-center items-center bg-[#F8F8F8] border border-[#CAC8C8] rounded-[10px] h-[138px] text-[#767676] space-y-[6px] mb-[10px]">
+                    <div
+                      className={clsx(
+                        "flex flex-col justify-center items-center bg-[#F8F8F8] border border-[#CAC8C8] rounded-[10px] h-[138px] text-[#767676] space-y-[6px] mb-[10px]",
+                        values.file !== undefined && "bg-[#FFFAF7]"
+                      )}
+                    >
                       <div className="flex gap-[6px] items-center">
-                        <p className="text-[22px]">드래그해서 업로드</p>
+                        <p className="text-[22px]">
+                          {values.file === undefined
+                            ? "드래그해서 업로드"
+                            : values.file.name}
+                        </p>
                         <SvgColor src="/icons/icon-upload.svg" />
                       </div>
                       <p>지원 가능한 파일 형식 안내: PDF, DOC, DOCX, TXT 등</p>
