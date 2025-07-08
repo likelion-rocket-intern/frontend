@@ -25,8 +25,14 @@ type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
 const ResumeUploadSchema = zod.object({
   file: zod
-    .instanceof(File, { message: "파일을 선택해주세요." })
-    .refine((file) => file.size > 0, { message: "파일이 비어있습니다." }),
+    .instanceof(File, { message: "파일을 업로드해주세요." })
+    .refine((file) => file.size > 0, {
+      message: "빈 파일은 업로드할 수 없습니다.",
+    })
+    // 파일 크기 5MB 초과 체크
+    .refine((file) => file.size <= 5 * 1024 * 1024, {
+      message: "파일 크기는 최대 5MB까지 허용됩니다.",
+    }),
   additional: zod.string(),
   manualResume: zod.string(),
 });
@@ -201,9 +207,10 @@ export default function ResumeUploadView() {
             {renderManualTab}
           </Tabs>
 
-          <section className="flex w-full justify-around space-x-6 *:flex-1 *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
-            <Button variant={"white"}>임시저장</Button>
-            <Button type="submit">저장하기</Button>
+          <section className="flex w-full justify-end space-x-6 *:w-[320px] *:h-[72px] *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
+            <Button variant={"white"} type="submit">
+              저장하기
+            </Button>
             <Button type="button">이력서 분석하기</Button>
           </section>
         </form>
