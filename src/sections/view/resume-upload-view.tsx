@@ -26,7 +26,7 @@ type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
 const ResumeUploadSchema = zod.object({
   file: zod
-    .instanceof(File, { message: "파일을 업로드해주세요." })
+    .instanceof(File, { message: "파일을 업로드 해주세요." })
     .refine((file) => file.size > 0, {
       message: "빈 파일은 업로드할 수 없습니다.",
     })
@@ -72,6 +72,7 @@ export default function ResumeUploadView() {
 
   // 폼 제출시 실행할 함수
   const onSubmit = (formData: ResumeUploadSchemaType) => {
+    setIsModalOpen(true);
     console.log(formData);
   };
 
@@ -95,7 +96,7 @@ export default function ResumeUploadView() {
         <FormField
           control={methods.control}
           name="file"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormControl>
                 <div>
@@ -115,14 +116,19 @@ export default function ResumeUploadView() {
                   <Label htmlFor="resumeUpload" className="block w-full">
                     <div
                       className={clsx(
-                        "flex flex-col justify-center items-center bg-[#F8F8F8] border border-[#CAC8C8] rounded-[10px] h-[138px] text-[#767676] space-y-[6px] mb-[10px]",
-                        values.file !== undefined && "bg-[#FFFAF7]"
+                        "flex flex-col justify-center items-center rounded-[10px] h-[138px] space-y-[6px] mb-[10px] transition-colors",
+                        values.file !== undefined && "bg-[#FFFAF7]",
+                        fieldState.invalid
+                          ? "bg-[#FFF9F9] border border-[#FF6161] text-[#F45C5C]"
+                          : "bg-[#F8F8F8] border border-[#CAC8C8] text-[#767676]"
                       )}
                     >
                       <div className="flex gap-[6px] items-center">
                         <p className="text-[22px]">
-                          {values.file === undefined
-                            ? "드래그해서 업로드"
+                          {fieldState.error
+                            ? fieldState.error.message
+                            : values.file === undefined
+                            ? "파일을 업로드 해주세요"
                             : values.file.name}
                         </p>
                         <SvgColor src="/icons/icon-upload.svg" />
@@ -135,7 +141,6 @@ export default function ResumeUploadView() {
                   </p>
                 </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -184,12 +189,7 @@ export default function ResumeUploadView() {
           </Tabs>
 
           <section className="flex w-full justify-end space-x-6 *:w-[320px] *:h-[72px] *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
-            <Button variant={"white"} type="submit">
-              저장하기
-            </Button>
-            <Button type="button" onClick={() => setIsModalOpen(true)}>
-              이력서 분석하기
-            </Button>
+            <Button type="submit">이력서 분석하기</Button>
           </section>
         </form>
       </Form>
