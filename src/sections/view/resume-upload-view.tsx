@@ -20,6 +20,7 @@ import {
 import { SvgColor } from "@/components/svg-color";
 import { useRef, useState } from "react";
 import clsx from "clsx";
+import Modal from "@/components/Modal";
 
 type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
@@ -39,6 +40,7 @@ const ResumeUploadSchema = zod.object({
 
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -211,10 +213,20 @@ export default function ResumeUploadView() {
             <Button variant={"white"} type="submit">
               저장하기
             </Button>
-            <Button type="button">이력서 분석하기</Button>
+            <Button type="button" onClick={() => setIsModalOpen(true)}>
+              이력서 분석하기
+            </Button>
           </section>
         </form>
       </Form>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="공통 모달"
+      >
+        <p className="mb-4">여기에 모달 내용이 들어갑니다.</p>
+      </Modal>
     </div>
   );
 }
