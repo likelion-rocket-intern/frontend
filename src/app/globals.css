@@ -6,6 +6,30 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Primary colors */
+  --color-primary-50: #fff1e7;
+  --color-primary-100: #ffd5b5;
+  --color-primary-200: #ffc091;
+  --color-primary-300: #ffa45f;
+  --color-primary-400: #ff9240;
+  --color-primary-500: #ff7710;
+  --color-primary-600: #e86c0f;
+  --color-primary-700: #b5540b;
+  --color-primary-800: #8c4109;
+  --color-primary-900: #6b3207;
+
+  /* Gray colors */
+  --color-gray-50: #f8f8f8;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d9d9d9;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #767676;
+  --color-gray-600: #505050;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #111111;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
