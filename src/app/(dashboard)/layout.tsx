@@ -1,5 +1,5 @@
-import DashboardFooter from "@/components/DashboardFooter";
-import DashboardHeader from "@/components/DashboardHeader";
+import DashboardFooter from "@/components/layouts/DashboardFooter";
+import DashboardHeader from "@/components/layouts/DashboardHeader";
 import React from "react";
 
 export default function DashboardLayout({
