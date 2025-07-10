@@ -4,6 +4,8 @@ import { z as zod } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,11 +20,12 @@ import {
 } from "@/components/ui/form";
 
 import { SvgColor } from "@/components/svg-color";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
+import { getTaskStatus, startAnalysis } from "@/app/lib/client";
 
-type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
+export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
 const ResumeUploadSchema = zod.object({
   file: zod
@@ -40,6 +43,7 @@ const ResumeUploadSchema = zod.object({
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [task_id, setTask_id] = useState<string>("");
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -70,10 +74,47 @@ export default function ResumeUploadView() {
   const manualResume = values.manualResume;
   const withoutSpacesManual = manualResume.replace(/\s/g, ""); // 직접 작성란 공백 제거
 
+  // 1. 이력서 분석 시작
+  const analysisMutation = useMutation({
+    mutationFn: startAnalysis,
+    onSuccess: (data) => {
+      const task_id = data.task_id;
+      setTask_id(task_id);
+    },
+    onError: (err) => {
+      console.error("분석 시작 실패:", err);
+    },
+  });
+
+  // 2. taskId로 상태 확인 (폴링)
+  const { data: taskStatus } = useQuery({
+    queryKey: ["task-status"],
+    queryFn: () => getTaskStatus(task_id!),
+    enabled: !!task_id, // taskId가 있을 때만 실행
+    refetchInterval: 1000, // 1초마다 호출
+  });
+
+  // task status 로깅
+  useEffect(() => {
+    if (!taskStatus) return;
+
+    console.log("현재 상태:", taskStatus.status);
+
+    if (taskStatus.status === "complete") {
+      console.log("분석 완료! 결과:", taskStatus);
+      // 🎯 완료 처리 (예: 페이지 이동)
+    } else if (taskStatus.status === "failed") {
+      console.error("분석 실패!");
+      // 🎯 실패 처리
+    }
+  }, [taskStatus]);
+
   // 폼 제출시 실행할 함수
-  const onSubmit = (formData: ResumeUploadSchemaType) => {
-    setIsModalOpen(true);
-    console.log(formData);
+  const onSubmit = async (formData: ResumeUploadSchemaType) => {
+    // setIsModalOpen(true);
+    // console.log(formData);
+    // 분석 요청
+    await analysisMutation.mutate(formData);
   };
 
   const renderUploadTab = (
