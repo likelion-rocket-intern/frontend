@@ -8,12 +8,7 @@ import clsx from "clsx";
 import { FormProvider, useForm } from "react-hook-form";
 
 export default function MypageView() {
-  const methods = useForm({
-    defaultValues: {
-      resume: 0, // 첫 번째 이력서 기본 선택
-      aptitude: 0,
-    },
-  });
+  const methods = useForm();
   const {
     reset,
     watch,
@@ -63,13 +58,13 @@ export default function MypageView() {
       <div className="flex gap-8 mb-[72px]">
         <FormProvider {...methods}>
           {/* 이력서 목록 */}
-          <section className="flex-1 flex flex-col gap-4">
+          <section className="relative flex-1 flex flex-col gap-4">
             <div className="border-b-2 border-[#D9D9D9] pb-4">
               <h2 className="title_1 text-[#777777]">이력서 목록</h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 h-[470px] overflow-y-scroll px-4 py-2">
               {/* 이력서 아이템 */}
-              {[1, 2, 3].map((item, idx) => (
+              {[1, 2, 3, 4, 5].map((item, idx) => (
                 <FormField
                   key={idx}
                   control={methods.control}
@@ -117,16 +112,18 @@ export default function MypageView() {
                 />
               ))}
             </div>
+            {/* 밑에서부터 그라데이션 */}
+            <div className="absolute bottom-0 left-0 right-0 h-30 pointer-events-none bg-gradient-to-t from-white to-transparent" />
           </section>
 
           {/* 적성검사 목록 */}
-          <section className="flex-1 flex flex-col gap-4">
+          <section className="relative flex-1 flex flex-col gap-4">
             <div className="border-b-2 border-[#D9D9D9] pb-4">
               <h2 className="title_1 text-[#777777]">적성검사 목록</h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 h-[470px] overflow-y-scroll px-4 py-2">
               {/* 적성검사 아이템 */}
-              {[1, 2, 3].map((item, idx) => (
+              {[1, 2, 3, 4, 5].map((item, idx) => (
                 <FormField
                   key={idx}
                   control={methods.control}
@@ -172,6 +169,8 @@ export default function MypageView() {
                 />
               ))}
             </div>
+            {/* 밑에서부터 그라데이션 */}
+            <div className="absolute bottom-0 left-0 right-0 h-30 pointer-events-none bg-gradient-to-t from-white to-transparent" />
           </section>
         </FormProvider>
       </div>
