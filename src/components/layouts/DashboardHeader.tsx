@@ -1,11 +1,5 @@
 import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
 import { paths } from "@/routes/paths";
 import Link from "next/link";
 
@@ -21,28 +15,20 @@ export default function DashboardHeader() {
             className="text-primary-500"
           />
         </Link>
-        <NavigationMenu>
-          <NavigationMenuList className="flex gap-8 *:cursor-pointer font-semibold">
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.root}>홈</NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.aptitude.test}>
-                적성검사
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.resume.upload}>
-                이력서분석
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.mypage}>
-                마이페이지
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <div className="flex gap-8 font-semibold">
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.root}>홈</Link>
+          </Button>
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.aptitude.test}>적성검사</Link>
+          </Button>
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.resume.upload}>이력서분석</Link>
+          </Button>
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.mypage}>마이페이지</Link>
+          </Button>
+        </div>
       </section>
 
       {/* right section */}
@@ -51,10 +37,6 @@ export default function DashboardHeader() {
           href={paths.mypage}
           className="size-7 rounded-full bg-slate-300"
         ></Link>
-        <p>회원가입</p>
-        <Button className="px-5 py-[10px] rounded-[8px] bg-[#FB923C]">
-          로그인
-        </Button>
       </section>
     </header>
   );

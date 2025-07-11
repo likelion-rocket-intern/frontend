@@ -3,6 +3,7 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import client from "@/app/lib/client";
+import { paths } from "@/routes/paths";
 
 // 카카오 로그인 콜백을 처리하는 컴포넌트
 function KakaoCallback() {
@@ -24,7 +25,7 @@ function KakaoCallback() {
           }
           if (data) {
             // 로그인 성공 시 메인 페이지로 리다이렉트
-            router.push("/");
+            router.push(paths.root);
           }
         });
     }
@@ -35,6 +36,8 @@ function KakaoCallback() {
 
 // 로그인 버튼 컴포넌트
 function LoginButton() {
+  const router = useRouter();
+
   const handleKakaoLogin = async () => {
     try {
       const { data, error } = await client.GET("/api/v1/auth/kakao/login", {});
@@ -44,7 +47,7 @@ function LoginButton() {
       }
       if (data?.authorization_url) {
         // 카카오 로그인 페이지로 리다이렉트
-        window.location.href = data.authorization_url;
+        router.push(data.authorization_url);
       }
     } catch (error) {
       console.error("Login error:", error);
