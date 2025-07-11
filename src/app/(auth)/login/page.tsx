@@ -24,7 +24,7 @@ function KakaoCallback() {
           }
           if (data) {
             // 로그인 성공 시 메인 페이지로 리다이렉트
-            router.push("/");
+            window.location.href = "/";  // Hard redirect to trigger middleware
           }
         });
     }
@@ -63,6 +63,19 @@ function LoginButton() {
 
 // 메인 로그인 페이지 컴포넌트
 export default function LoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if already logged in by making a request to /api/v1/auth/me
+    client.GET("/api/v1/auth/me", {})
+      .then(({ data, error }) => {
+        if (data && !error) {
+          // If we get a successful response, we're logged in
+          window.location.href = "/";  // Hard redirect to trigger middleware
+        }
+      });
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
