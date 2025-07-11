@@ -24,7 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
-import ResumeReportView from "@/sections/view/resume-report-view";
+import { useRouter } from "next/navigation";
 
 export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
@@ -45,7 +45,7 @@ export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [task_id, setTask_id] = useState<string>("");
-  const [resumeId, setResumeId] = useState<number | null>(null);
+  const router = useRouter();
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -93,7 +93,11 @@ export default function ResumeUploadView() {
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
     enabled: !!task_id, // taskId가 있을 때만 실행
-    refetchInterval: 1000, // 1초마다 호출
+    refetchInterval: (data) => {
+      if (!data) return 1000; // 데이터 없으면 계속 폴링
+      if (data.status === "complete" || data.status === "failed") return false; // 완료/실패 시 폴링 중단
+      return 1000; // 그 외엔 1초마다 폴링
+    },
   });
 
   // task status 로깅
@@ -104,9 +108,9 @@ export default function ResumeUploadView() {
 
     if (taskStatus.status === "complete") {
       console.log("분석 완료! 결과:", taskStatus);
-      // 🎯 완료 처리 (예: 페이지 이동)
+      // 🎯 완료 처리 (페이지 이동)
       if (taskStatus.resume_id) {
-        setResumeId(taskStatus.resume_id);
+        router.push(`/resume/report/${taskStatus.resume_id}`);
       }
     } else if (taskStatus.status === "failed") {
       console.error("분석 실패!");
@@ -247,8 +251,6 @@ export default function ResumeUploadView() {
       >
         <p className="mb-4">이력서를 분석중입니다.</p>
       </Modal>
-
-      {resumeId && <ResumeReportView resumeId={resumeId} />}
     </div>
   );
 }

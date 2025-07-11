@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import client from "@/app/lib/client";
+import { useParams } from "next/navigation";
 
 const mockData = {
   job_fitness: [
@@ -150,15 +151,17 @@ async function getResumeDetail(
   const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
     params: {
       path: {
-        resume_id: resumeId
-      }
-    }
+        resume_id: resumeId,
+      },
+    },
   });
   if (error?.detail) throw new Error(error.detail[0]?.msg || "API 요청 실패");
   return data as ResumeDetailResponse;
 }
 
-export default function ResumeReportView({ resumeId }: { resumeId?: number }) {
+export default function ResumeReportView() {
+  const params = useParams();
+  const resumeId = params?.id ? Number(params.id) : undefined;
   const [resumeDetail, setResumeDetail] = useState<ResumeDetailResponse | null>(
     null
   );
@@ -167,7 +170,6 @@ export default function ResumeReportView({ resumeId }: { resumeId?: number }) {
 
   useEffect(() => {
     if (!resumeId) return;
-
     setLoading(true);
     getResumeDetail(resumeId)
       .then((data) => setResumeDetail(data))
@@ -215,13 +217,15 @@ export default function ResumeReportView({ resumeId }: { resumeId?: number }) {
           {mockData.job_fitness.map((job, idx) => (
             <li
               key={job.name}
-              className={`p-5 rounded-xl ${idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
-                }`}
+              className={`p-5 rounded-xl ${
+                idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
+              }`}
             >
               <div className="flex items-center mb-2">
                 <span
-                  className={`font-bold text-lg ${idx === 0 ? "text-blue-600" : "text-gray-800"
-                    }`}
+                  className={`font-bold text-lg ${
+                    idx === 0 ? "text-blue-600" : "text-gray-800"
+                  }`}
                 >
                   {idx + 1}. {job.name}
                 </span>
