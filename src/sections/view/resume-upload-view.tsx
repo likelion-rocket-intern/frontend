@@ -138,11 +138,7 @@ export default function ResumeUploadView() {
           <h1 className="text-[32px] text-[#777777]">
             이력서를 업로드해주세요
           </h1>
-          <Button
-            type="button"
-            onClick={() => handleFileSelectClick()}
-            className="py-2 px-4 leading-none h-[38px]"
-          >
+          <Button type="button" onClick={() => handleFileSelectClick()}>
             파일 선택
           </Button>
         </div>
@@ -242,8 +238,10 @@ export default function ResumeUploadView() {
             {renderManualTab}
           </Tabs>
 
-          <section className="flex w-full justify-end space-x-6 *:w-[320px] *:h-[72px] *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
-            <Button type="submit">이력서 분석하기</Button>
+          <section className="flex w-full justify-end space-x-6">
+            <Button type="submit" variant={"default_primary"} size={"large"}>
+              이력서 분석하기
+            </Button>
           </section>
         </form>
       </Form>
