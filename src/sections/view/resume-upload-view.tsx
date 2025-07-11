@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
+import ResumeReportView from "@/sections/view/resume-report-view";
 
 export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
@@ -44,6 +45,7 @@ export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [task_id, setTask_id] = useState<string>("");
+  const [resumeId, setResumeId] = useState<number | null>(null);
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -103,6 +105,9 @@ export default function ResumeUploadView() {
     if (taskStatus.status === "complete") {
       console.log("분석 완료! 결과:", taskStatus);
       // 🎯 완료 처리 (예: 페이지 이동)
+      if (taskStatus.resume_id) {
+        setResumeId(taskStatus.resume_id);
+      }
     } else if (taskStatus.status === "failed") {
       console.error("분석 실패!");
       // 🎯 실패 처리
@@ -242,6 +247,8 @@ export default function ResumeUploadView() {
       >
         <p className="mb-4">이력서를 분석중입니다.</p>
       </Modal>
+
+      {resumeId && <ResumeReportView resumeId={resumeId} />}
     </div>
   );
 }
