@@ -5,24 +5,33 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[6px] transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
-        default: "bg-black text-white shadow-xs hover:bg-primary/90",
+        default_primary:
+          "bg-primary-500 text-white hover:bg-primary-400 active:bg-primary-200",
+        default: "bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-400",
         white:
           "bg-white text-black shadow-xs border border-slate-200 hover:bg-slate-100 focus-visible:ring-slate-500 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        outline_primary:
+          "bg-primary-50 border border-primary-500 text-primary-500 hover:text-primary-600 active:text-primary-300 active:bg-primary-300",
+        outline_default:
+          "bg-white border border-gray-200 text-gray-700 hover:border-gray-300 active:border-gray-400",
+        link_primary:
+          "text-primary-600 hover:text-primary-800 active:text-primary-300",
+        link_default: "text-gray-500 hover:text-gray-600 active:text-gray-400",
+      },
+      size: {
+        small:
+          "py-5 px-[10px] text-[16px] font-semibold leading-[1.4] tracking-[-0.4px]",
+        medium: "py-[54px] text-[20px]",
+        large: "py-[86px] px-5 text-[24px]",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "default_primary",
+      size: "small",
     },
   }
 );
@@ -30,6 +39,7 @@ const buttonVariants = cva(
 function Button({
   className,
   variant,
+  size,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -41,7 +51,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, className }))}
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   );
