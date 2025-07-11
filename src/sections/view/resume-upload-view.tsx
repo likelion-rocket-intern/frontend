@@ -97,9 +97,9 @@ export default function ResumeUploadView() {
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
     enabled: !!task_id, // taskId가 있을 때만 실행
-    refetchInterval: (data) => {
-      if (!data) return 1000; // 데이터 없으면 계속 폴링
-      if (data.status === "completed" || data.status === "failed") return false; // 완료/실패 시 폴링 중단
+    refetchInterval: (query) => {
+      if (!query.state.data) return 1000; // 데이터 없으면 계속 폴링
+      if (query.state.data.status === "completed" || query.state.data.status === "failed") return false; // 완료/실패 시 폴링 중단
       return 1000; // 그 외엔 1초마다 폴링
     },
   });
