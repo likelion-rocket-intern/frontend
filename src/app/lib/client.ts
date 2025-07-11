@@ -8,27 +8,34 @@ const client = createClient<paths>({
   baseUrl,
   credentials: "include",
 });
-
-// 이력서 분석 요청 (POST)
 export async function startAnalysis(formData: ResumeUploadSchemaType) {
   const multipartForm = new FormData();
-  multipartForm.append("file", formData.file);
-  multipartForm.append("manualResume", formData.manualResume);
+  if (formData.file) {
+    multipartForm.append("file", formData.file);
+  }
+  if (formData.manualResume) {
+    multipartForm.append("manualResume", formData.manualResume);
+  }
 
   const { data, error } = await client.POST("/api/v1/resume/analysis", {
-    body: multipartForm,
+    body: multipartForm as any, // FormData 타입 문제 해결
   });
 
   if (error) throw error;
-  return data!; // undefined가 아닌 경우에만 반환
+  return data as {
+    message: string;
+    filename: string;
+    status: string;
+    task_id: string;
+  };
 }
-
 // 분석 상태 확인 (GET)
 export async function getTaskStatus(task_id: string) {
-  const { data, error } = await client.GET(`/api/v1/resume/task/${task_id}`);
-
+  const { data, error } = await client.GET("/api/v1/resume/task/{task_id}", {
+    params: { path: { task_id } },
+  });
   if (error) throw error;
-  return data!;
+  return data as { status: string; resume_id?: number };
 }
 
 export default client;
