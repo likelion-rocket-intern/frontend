@@ -74,9 +74,7 @@ export default function SelectForm({
                     src="/icons/icon-more-vertical.svg"
                     className="text-[#767676]"
                   />
-                  <Button className="px-4 py-2 caption_1 rounded-[6px]">
-                    결과보기
-                  </Button>
+                  <Button>결과보기</Button>
                 </div>
               </Label>
             ))}

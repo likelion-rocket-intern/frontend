@@ -47,14 +47,14 @@ export default function MypageView() {
           <span className="body_1 text-stone-600">dlsmdfur34@naver.com</span>
           <div className="flex items-center">
             <Button
-              variant={"ghost"}
+              variant={"link_default"}
               className="px-4 py-2 text-[#767676] caption_1"
             >
               로그아웃
             </Button>
             <div className="w-[1px] h-6 bg-[#D9D9D9] mx-4"></div>
             <Button
-              variant={"ghost"}
+              variant={"link_default"}
               className="px-4 py-2 text-[#767676] caption_1"
             >
               회원탈퇴
