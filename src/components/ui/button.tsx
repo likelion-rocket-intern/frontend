@@ -10,23 +10,25 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default_primary:
-          "bg-primary-500 text-white hover:bg-primary-400 active:bg-primary-200",
-        default: "bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-400",
-        white:
-          "bg-white text-black shadow-xs border border-slate-200 hover:bg-slate-100 focus-visible:ring-slate-500 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "bg-primary-500 text-white hover:bg-primary-400 active:bg-primary-200 disabled:bg-gray-300",
+        default:
+          "bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-400 disabled:bg-gray-300",
         outline_primary:
-          "bg-primary-50 border border-primary-500 text-primary-500 hover:text-primary-600 active:text-primary-300 active:bg-primary-300",
+          "bg-primary-50 border border-primary-500 text-primary-500 hover:text-primary-600 active:text-primary-300 active:bg-primary-300 disabled:bg-gray-200 disabled:border disabled:border-gray-300",
         outline_default:
-          "bg-white border border-gray-200 text-gray-700 hover:border-gray-300 active:border-gray-400",
+          "bg-white border border-gray-200 text-gray-700 hover:border-gray-300 active:border-gray-400 disabled:bg-gray-200 disabled:border disabled:border-gray-300",
         link_primary:
-          "text-primary-600 hover:text-primary-800 active:text-primary-300",
-        link_default: "text-gray-500 hover:text-gray-600 active:text-gray-400",
+          "text-primary-600 hover:text-primary-800 active:text-primary-300 disabled:text-gray-300",
+        link_default:
+          "text-gray-500 hover:text-gray-600 active:text-gray-400 disabled:text-gray-300",
       },
       size: {
         small:
           "py-5 px-[10px] text-[16px] font-semibold leading-[1.4] tracking-[-0.4px]",
-        medium: "py-[54px] text-[20px]",
-        large: "py-[86px] px-5 text-[24px]",
+        medium:
+          "py-[54px] px-[10px] text-[20px] font-semibold leading-[1.4] tracking-[-0.5px]",
+        large:
+          "py-[86px] px-5 text-[24px] font-bold leading-[1.4] tracking-[-0.6px]",
       },
     },
     defaultVariants: {
