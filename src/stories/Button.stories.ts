@@ -33,10 +33,50 @@ export default meta;
 
 type Story = StoryObj<typeof Button>;
 
-export const Playground: Story = {
+export const DefaultPrimary: Story = {
   args: {
-    children: "Button",
+    children: "Default Primary",
     variant: "default_primary",
+    size: "small",
+  },
+};
+
+export const Default: Story = {
+  args: {
+    children: "Default",
+    variant: "default",
+    size: "small",
+  },
+};
+
+export const OutlinePrimary: Story = {
+  args: {
+    children: "Outline Primary",
+    variant: "outline_primary",
+    size: "small",
+  },
+};
+
+export const OutlineDefault: Story = {
+  args: {
+    children: "Outline Default",
+    variant: "outline_default",
+    size: "small",
+  },
+};
+
+export const LinkPrimary: Story = {
+  args: {
+    children: "Link Primary",
+    variant: "link_primary",
+    size: "small",
+  },
+};
+
+export const LinkDefault: Story = {
+  args: {
+    children: "Link Default",
+    variant: "link_default",
     size: "small",
   },
 };

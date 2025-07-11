@@ -24,11 +24,11 @@ const buttonVariants = cva(
       },
       size: {
         small:
-          "py-5 px-[10px] text-[16px] font-semibold leading-[1.4] tracking-[-0.4px]",
+          "px-5 py-[10px] text-[16px] font-semibold leading-[1.4] tracking-[-0.4px]",
         medium:
-          "py-[54px] px-[10px] text-[20px] font-semibold leading-[1.4] tracking-[-0.5px]",
+          "px-[54px] py-[10px] text-[20px] font-semibold leading-[1.4] tracking-[-0.5px]",
         large:
-          "py-[86px] px-5 text-[24px] font-bold leading-[1.4] tracking-[-0.6px]",
+          "px-[86px] py-5 text-[24px] font-bold leading-[1.4] tracking-[-0.6px]",
       },
     },
     defaultVariants: {
