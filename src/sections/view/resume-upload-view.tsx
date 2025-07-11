@@ -25,6 +25,10 @@ import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
 import { useRouter } from "next/navigation";
+import { paths } from "@/app/lib/schema";
+import type { components } from "@/app/lib/schema";
+
+type TaskStatusResponse = components["schemas"]["TaskStatusResponse"];
 
 export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
@@ -89,13 +93,13 @@ export default function ResumeUploadView() {
   });
 
   // 2. taskId로 상태 확인 (폴링)
-  const { data: taskStatus } = useQuery({
+  const { data: taskStatus } = useQuery<TaskStatusResponse>({
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
     enabled: !!task_id, // taskId가 있을 때만 실행
     refetchInterval: (data) => {
       if (!data) return 1000; // 데이터 없으면 계속 폴링
-      if (data.status === "complete" || data.status === "failed") return false; // 완료/실패 시 폴링 중단
+      if (data.status === "completed" || data.status === "failed") return false; // 완료/실패 시 폴링 중단
       return 1000; // 그 외엔 1초마다 폴링
     },
   });
@@ -106,17 +110,17 @@ export default function ResumeUploadView() {
 
     console.log("현재 상태:", taskStatus.status);
 
-    if (taskStatus.status === "complete") {
+    if (taskStatus.status === "completed") {
       console.log("분석 완료! 결과:", taskStatus);
       // 🎯 완료 처리 (페이지 이동)
-      if (taskStatus.resume_id) {
-        router.push(`/resume/report/${taskStatus.resume_id}`);
+      if (taskStatus.result?.resume_id) {
+        router.push(`/resume/report/${taskStatus.result.resume_id}`);
       }
     } else if (taskStatus.status === "failed") {
       console.error("분석 실패!");
       // 🎯 실패 처리
     }
-  }, [taskStatus]);
+  }, [taskStatus, router]);
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
@@ -178,8 +182,8 @@ export default function ResumeUploadView() {
                           {fieldState.error
                             ? fieldState.error.message
                             : values.file === undefined
-                            ? "파일을 업로드 해주세요"
-                            : values.file.name}
+                              ? "파일을 업로드 해주세요"
+                              : values.file.name}
                         </p>
                         <SvgColor src="/icons/icon-upload.svg" />
                       </div>

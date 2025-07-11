@@ -1,6 +1,7 @@
 import createClient from "openapi-fetch";
 import type { paths } from "./schema";
 import { ResumeUploadSchemaType } from "@/sections/view/resume-upload-view";
+import type { components } from "./schema";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -35,7 +36,7 @@ export async function getTaskStatus(task_id: string) {
     params: { path: { task_id } },
   });
   if (error) throw error;
-  return data as { status: string; resume_id?: number };
+  return data as components["schemas"]["TaskStatusResponse"];
 }
 
 export default client;

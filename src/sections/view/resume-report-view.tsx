@@ -140,8 +140,11 @@ type ResumeDetailResponse = {
   id: number;
   user_id: number;
   version: string;
-  file_path: string;
-  analysis_result: string;
+  original_filename?: string;
+  upload_filename?: string;
+  file_url?: string;
+  file_path?: string;
+  analysis_result: string | Record<string, any>;
   created_at: string;
 };
 
@@ -155,7 +158,7 @@ async function getResumeDetail(
       },
     },
   });
-  if (error?.detail) throw new Error(error.detail[0]?.msg || "API 요청 실패");
+  if (error) throw new Error("API 요청 실패");
   return data as ResumeDetailResponse;
 }
 
@@ -198,13 +201,15 @@ export default function ResumeReportView() {
                 Version: {resumeDetail.version}
               </div>
               <div className="text-sm text-gray-600">
-                File Path: {resumeDetail.file_path}
+                File Path: {resumeDetail.file_path || resumeDetail.file_url}
               </div>
               <div className="text-sm text-gray-600">
                 Created At: {resumeDetail.created_at}
               </div>
               <div className="text-sm text-gray-800 mt-2">
-                분석 결과: {resumeDetail.analysis_result}
+                분석 결과: {typeof resumeDetail.analysis_result === 'string'
+                  ? resumeDetail.analysis_result
+                  : JSON.stringify(resumeDetail.analysis_result, null, 2)}
               </div>
             </div>
           )}
@@ -217,15 +222,13 @@ export default function ResumeReportView() {
           {mockData.job_fitness.map((job, idx) => (
             <li
               key={job.name}
-              className={`p-5 rounded-xl ${
-                idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
-              }`}
+              className={`p-5 rounded-xl ${idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
+                }`}
             >
               <div className="flex items-center mb-2">
                 <span
-                  className={`font-bold text-lg ${
-                    idx === 0 ? "text-blue-600" : "text-gray-800"
-                  }`}
+                  className={`font-bold text-lg ${idx === 0 ? "text-blue-600" : "text-gray-800"
+                    }`}
                 >
                   {idx + 1}. {job.name}
                 </span>
