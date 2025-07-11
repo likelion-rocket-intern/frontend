@@ -147,8 +147,14 @@ type ResumeDetailResponse = {
 async function getResumeDetail(
   resumeId: number
 ): Promise<ResumeDetailResponse> {
-  const { data, error } = await client.GET(`/api/v1/resume/${resumeId}`);
-  if (error) throw new Error(error.message || "API 요청 실패");
+  const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
+    params: {
+      path: {
+        resume_id: resumeId
+      }
+    }
+  });
+  if (error?.detail) throw new Error(error.detail[0]?.msg || "API 요청 실패");
   return data as ResumeDetailResponse;
 }
 
@@ -209,15 +215,13 @@ export default function ResumeReportView({ resumeId }: { resumeId?: number }) {
           {mockData.job_fitness.map((job, idx) => (
             <li
               key={job.name}
-              className={`p-5 rounded-xl ${
-                idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
-              }`}
+              className={`p-5 rounded-xl ${idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"
+                }`}
             >
               <div className="flex items-center mb-2">
                 <span
-                  className={`font-bold text-lg ${
-                    idx === 0 ? "text-blue-600" : "text-gray-800"
-                  }`}
+                  className={`font-bold text-lg ${idx === 0 ? "text-blue-600" : "text-gray-800"
+                    }`}
                 >
                   {idx + 1}. {job.name}
                 </span>

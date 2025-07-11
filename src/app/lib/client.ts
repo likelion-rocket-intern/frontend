@@ -18,7 +18,7 @@ export async function startAnalysis(formData: ResumeUploadSchemaType) {
   }
 
   const { data, error } = await client.POST("/api/v1/resume/analysis", {
-    body: multipartForm,
+    body: multipartForm as any, // FormData 타입 문제 해결
   });
 
   if (error) throw error;
