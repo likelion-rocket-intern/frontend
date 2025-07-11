@@ -50,6 +50,7 @@ export default function ResumeUploadView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [task_id, setTask_id] = useState<string>("");
   const router = useRouter();
+  const [shouldPoll, setShouldPoll] = useState(true);
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -96,29 +97,30 @@ export default function ResumeUploadView() {
   const { data: taskStatus } = useQuery<TaskStatusResponse>({
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
-    enabled: !!task_id, // taskId가 있을 때만 실행
-    refetchInterval: (query) => {
-      if (!query.state.data) return 1000; // 데이터 없으면 계속 폴링
-      if (query.state.data.status === "completed" || query.state.data.status === "failed") return false; // 완료/실패 시 폴링 중단
-      return 1000; // 그 외엔 1초마다 폴링
-    },
+    enabled: !!task_id && shouldPoll, // taskId가 있고 폴링이 필요할 때만 실행
+    refetchInterval: 1000, // 1초마다 폴링
   });
 
-  // task status 로깅
+  // task status 로깅 및 폴링 제어
   useEffect(() => {
     if (!taskStatus) return;
 
     console.log("현재 상태:", taskStatus.status);
 
-    if (taskStatus.status === "completed") {
-      console.log("분석 완료! 결과:", taskStatus);
-      // 🎯 완료 처리 (페이지 이동)
-      if (taskStatus.result?.resume_id) {
-        router.push(`/resume/report/${taskStatus.result.resume_id}`);
+    // 완료 또는 실패 시 폴링 중단
+    if (taskStatus.status === "completed" || taskStatus.status === "failed") {
+      setShouldPoll(false); // 폴링 중단
+
+      if (taskStatus.status === "completed") {
+        console.log("분석 완료! 결과:", taskStatus);
+        // 🎯 완료 처리 (페이지 이동)
+        if (taskStatus.result?.resume_id) {
+          router.push(`/resume/report/${taskStatus.result.resume_id}`);
+        }
+      } else {
+        console.error("분석 실패!");
+        // 🎯 실패 처리
       }
-    } else if (taskStatus.status === "failed") {
-      console.error("분석 실패!");
-      // 🎯 실패 처리
     }
   }, [taskStatus, router]);
 
