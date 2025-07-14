@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import client from "@/app/lib/client";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 type JobFitness = {
   name: string;
@@ -34,7 +35,9 @@ type ResumeDetailResponse = {
   created_at: string;
 };
 
-async function getResumeDetail(resumeId: number): Promise<ResumeDetailResponse> {
+async function getResumeDetail(
+  resumeId: number
+): Promise<ResumeDetailResponse> {
   const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
     params: {
       path: {
@@ -49,7 +52,9 @@ async function getResumeDetail(resumeId: number): Promise<ResumeDetailResponse> 
 export default function ResumeReportView() {
   const params = useParams();
   const resumeId = params?.id ? Number(params.id) : undefined;
-  const [resumeDetail, setResumeDetail] = useState<ResumeDetailResponse | null>(null);
+  const [resumeDetail, setResumeDetail] = useState<ResumeDetailResponse | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,62 +68,45 @@ export default function ResumeReportView() {
   }, [resumeId]);
 
   // analysis_result가 문자열이면 파싱
-  const analysisResult = typeof resumeDetail?.analysis_result === 'string'
-    ? JSON.parse(resumeDetail.analysis_result) as AnalysisResult
-    : resumeDetail?.analysis_result as AnalysisResult;
+  const analysisResult =
+    typeof resumeDetail?.analysis_result === "string"
+      ? (JSON.parse(resumeDetail.analysis_result) as AnalysisResult)
+      : (resumeDetail?.analysis_result as AnalysisResult);
 
-  if (loading) return <div className="text-center py-10">불러오는 중...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
-  if (!resumeDetail || !analysisResult) return <div className="text-center py-10">데이터가 없습니다.</div>;
+  // if (loading) return <div className="text-center py-10">불러오는 중...</div>;
+  // if (error)
+  //   return <div className="text-center py-10 text-red-500">{error}</div>;
+  // if (!resumeDetail || !analysisResult)
+  //   return <div className="text-center py-10">데이터가 없습니다.</div>;
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 mb-10 p-6 bg-white rounded-2xl shadow-lg">
-      <h1 className="text-3xl font-bold mb-8">이력서 결과 리포트</h1>
+    <div className="flex flex-col gap-20">
+      {/* 이력서 요약 */}
+      <section className="space-y-8">
+        <h2 className="title_2 text-gray-500">이력서</h2>
+        <div className="flex gap-6">
+          {/* 프로필 */}
+          <article className="w-45 flex flex-col gap-4">
+            <div className="size-38 bg-gray-300"></div>
+            <div>
+              <h3 className="title_1 text-gray-500 mb-1">
+                고구마 오억오천개먹기
+              </h3>
+              <p className="body_2 text-gray-400">dlsmdfur37@email.com</p>
+            </div>
+          </article>
 
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-5">직무 적합도 TOP 8</h2>
-        <ul className="space-y-6">
-          {analysisResult.job_fitness.slice(0, 8).map((job, idx) => (
-            <li
-              key={job.name}
-              className={`p-5 rounded-xl ${idx === 0 ? "bg-blue-50 shadow-md" : "bg-gray-100"}`}
-            >
-              <div className="flex items-center mb-2">
-                <span
-                  className={`font-bold text-lg ${idx === 0 ? "text-blue-600" : "text-gray-800"}`}
-                >
-                  {idx + 1}. {job.name}
-                </span>
-                <span className="ml-auto font-semibold text-blue-600 text-base">
-                  {job.score.toFixed(2)}점
-                </span>
-              </div>
-              <div className="text-gray-600 text-sm">{job.skill}</div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-5">이력서 평가</h2>
-        <ul className="space-y-5">
-          {analysisResult.resume_evaluation.map((item) => (
-            <li
-              key={item.attribute}
-              className={`p-4 rounded-lg ${item.category === "장점" ? "bg-blue-50 border border-blue-200" : "bg-red-50 border border-red-200"
-                }`}
-            >
-              <div className={`font-bold text-base ${item.category === "장점" ? "text-blue-600" : "text-red-600"
-                } mb-1`}>
-                {item.attribute}
-                <span className="font-normal text-gray-500 text-sm ml-2">
-                  ({item.score.toFixed(2)}점)
-                </span>
-              </div>
-              <div className="text-gray-700 text-sm">{item.description}</div>
-            </li>
-          ))}
-        </ul>
+          {/* 요약 */}
+          <article className="flex-1 bg-gray-25 rounded-[10px] p-6 space-y-[10px]">
+            <blockquote className="body_1 text-center text-gray-500 h-[84px] mt-[30px]">
+              “이력서 요약”
+            </blockquote>
+            <p className="text-gray-500 body_1">
+              강점: 성능 최적화, 문제 해결, 자기주도 학습, 책임감 등
+            </p>
+            <p className="text-gray-500 body_1">약점: 이러한 요약1줄</p>
+          </article>
+        </div>
       </section>
     </div>
   );
