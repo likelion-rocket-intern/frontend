@@ -8,7 +8,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
   const pathname = usePathname();
-  console.log(pathname);
 
   return (
     <header className="flex items-center justify-between h-20 w-full px-40 border-b border-gray-300">

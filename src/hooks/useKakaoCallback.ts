@@ -24,7 +24,6 @@ export function useKakaoCallback() {
           if (data) {
             // 로그인 성공 시 메인 페이지로 리다이렉트
             router.push(paths.root);
-            window.location.href = "/"; // Hard redirect to trigger middleware
           }
         });
     }
