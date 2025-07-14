@@ -92,7 +92,11 @@ export default function AptitudeTestView() {
         answers: formatAnswers(answers),
       };
 
-      const { data, error } = await (client.POST as any)(
+      // const { data, error } = await (client.POST as any)('/api/v1/jinro/test-report-v1', {
+      //   body: requestBody
+      // });
+
+      const { data, error } = await client.POST(
         "/api/v1/jinro/test-report-v1",
         {
           body: requestBody,
