@@ -12,6 +12,7 @@ interface SelectFormProps {
   values: MypageSchemaType;
   methods: UseFormReturn<MypageSchemaType>;
   title: string;
+  itemTitle: string;
   name: "resume" | "aptitude";
 }
 
@@ -19,6 +20,7 @@ export default function SelectForm({
   values,
   methods,
   title,
+  itemTitle,
   name,
 }: SelectFormProps) {
   return (
@@ -45,7 +47,9 @@ export default function SelectForm({
                 key={idx}
                 className={clsx(
                   "flex items-center justify-between px-4 py-6 rounded-2xl",
-                  field.value === idx ? "ring ring-[#A3A3A3]" : ""
+                  field.value === idx
+                    ? "ring ring-gray-400 shadow-[0_4px_6px_0_rgba(0,0,0,0.09)]"
+                    : ""
                 )}
               >
                 <div className="flex items-center gap-4 py-4">
@@ -61,9 +65,7 @@ export default function SelectForm({
                     </FormControl>
                   </FormItem>
                   <div>
-                    <p className="subtitle_1 text-[#767676]">
-                      000이력서입니다.(이력서제목)
-                    </p>
+                    <p className="subtitle_1 text-[#767676]">{itemTitle}</p>
                     <p className="label_1 text-[#D9D9D9]">
                       분석 완료 2025.07.07
                     </p>
@@ -74,7 +76,7 @@ export default function SelectForm({
                     src="/icons/icon-more-vertical.svg"
                     className="text-[#767676]"
                   />
-                  <Button>결과보기</Button>
+                  <Button variant={"outline_primary"}>결과불러오기</Button>
                 </div>
               </Label>
             ))}

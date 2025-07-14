@@ -19,6 +19,7 @@
   --color-primary-900: #6b3207;
 
   /* Gray colors */
+  --color-gray-25: #fbfbfb;
   --color-gray-50: #f8f8f8;
   --color-gray-100: #f5f5f5;
   --color-gray-200: #e5e5e5;
@@ -159,6 +160,14 @@ body {
 
 /* TYPOGRAPHY */
 @utility title_1 {
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%; /* 44.8px */
+  letter-spacing: -0.8px;
+}
+
+@utility title_2 {
   font-size: 32px;
   font-style: normal;
   font-weight: 500;

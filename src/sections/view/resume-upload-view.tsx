@@ -180,8 +180,8 @@ export default function ResumeUploadView() {
                           {fieldState.error
                             ? fieldState.error.message
                             : values.file === undefined
-                              ? "파일을 업로드 해주세요"
-                              : values.file.name}
+                            ? "파일을 업로드 해주세요"
+                            : values.file.name}
                         </p>
                         <SvgColor src="/icons/icon-upload.svg" />
                       </div>
@@ -242,7 +242,7 @@ export default function ResumeUploadView() {
 
           <section className="flex w-full justify-end space-x-6">
             <Button type="submit" variant={"default_primary"} size={"large"}>
-              이력서 분석하기
+              {isSubmitting ? "이력서를 분석 중입니다" : "이력서 분석하기"}
             </Button>
           </section>
         </form>
