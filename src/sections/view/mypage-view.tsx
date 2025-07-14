@@ -38,38 +38,30 @@ export default function MypageView() {
 
   return (
     <>
-      <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20">
+      <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
         <div className="size-[112px] bg-white rounded-full"></div>
         <section className="flex flex-col gap-2 w-[318px]">
-          <span className="text-[28px] font-medium leading-[140%] tracking-[-0.7px] not-italic">
-            이능력
-          </span>
-          <span className="body_1 text-stone-600">dlsmdfur34@naver.com</span>
-          <div className="flex items-center">
-            <Button
-              variant={"link_default"}
-              className="px-4 py-2 text-[#767676] caption_1"
-            >
+          <span className="title_1">이능력</span>
+          <span className="body_2">dlsmdfur34@naver.com</span>
+          <div className="flex items-center text-gray-400">
+            <Button variant={"link_default"} className="px-4 py-2 caption_1">
               로그아웃
             </Button>
             <div className="w-[1px] h-6 bg-[#D9D9D9] mx-4"></div>
-            <Button
-              variant={"link_default"}
-              className="px-4 py-2 text-[#767676] caption_1"
-            >
+            <Button variant={"link_default"} className="px-4 py-2 caption_1">
               회원탈퇴
             </Button>
           </div>
         </section>
-        <div className="w-0.5 h-[106px] bg-[#AFAFAF]"></div>
+        <div className="w-0.5 h-[106px] bg-gray-200"></div>
         <section className="w-[180px] flex flex-col gap-2 items-center">
-          <span className="subtitle_1 text-[#767676]">이력서</span>
-          <span className="title_1 text-[#525252]">0건</span>
+          <span className="body_1">이력서</span>
+          <span className="subtitle_1">0건</span>
         </section>
-        <div className="w-0.5 h-[106px] bg-[#AFAFAF]"></div>
+        <div className="w-0.5 h-[106px] bg-gray-200"></div>
         <section className="w-[180px] flex flex-col gap-2 items-center">
-          <span className="subtitle_1 text-[#767676]">적성검사</span>
-          <span className="title_1 text-[#525252]">0건</span>
+          <span className="body_1">적성검사</span>
+          <span className="subtitle_1">0건</span>
         </section>
       </div>
 
@@ -81,6 +73,7 @@ export default function MypageView() {
             {/* 이력서 목록 */}
             <SelectForm
               title="이력서 목록"
+              itemTitle="000 이력서입니다."
               name="resume"
               values={values}
               methods={methods}
@@ -89,6 +82,7 @@ export default function MypageView() {
             {/* 적성검사 목록 */}
             <SelectForm
               title="적성검사 목록"
+              itemTitle="적성검사"
               name="aptitude"
               values={values}
               methods={methods}

@@ -29,7 +29,7 @@ export function KakaoLoginButton() {
       size={"large"}
       className="bg-[#FFE300] text-gray-800 hover:bg-[#F0D600]"
     >
-      <SvgColor src="/icons/icon-message-circle.svg" width={16} height={16} />
+      <SvgColor src="/icons/icon-message-circle.svg" width={21} height={21} />
       카카오톡으로 시작하기
     </Button>
   );
