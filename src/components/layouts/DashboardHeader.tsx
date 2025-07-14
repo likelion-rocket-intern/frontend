@@ -1,9 +1,15 @@
+"use client";
+
 import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
 import { paths } from "@/routes/paths";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
+  const pathname = usePathname();
+  console.log(pathname);
+
   return (
     <header className="flex items-center justify-between h-20 w-full px-40 border-b border-gray-300">
       {/* left section */}
@@ -34,10 +40,12 @@ export default function DashboardHeader() {
 
       {/* right section */}
       <section className="flex items-center gap-6">
-        <Link
-          href={paths.mypage}
-          className="size-7 rounded-full bg-slate-300"
-        ></Link>
+        {pathname !== "/login" && (
+          <Link
+            href={paths.mypage}
+            className="size-7 rounded-full bg-slate-300"
+          ></Link>
+        )}
       </section>
     </header>
   );
