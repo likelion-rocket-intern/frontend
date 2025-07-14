@@ -101,10 +101,7 @@ export default function MypageView() {
               <div>
                 <h2 className="title_1 text-[#767676] mb-2">종합결과</h2>
               </div>
-              <Button
-                type="submit"
-                className="px-4 py-2 rounded-md caption_1 bg-primary-500"
-              >
+              <Button type="submit" variant={"default_primary"}>
                 종합결과보기
               </Button>
             </header>
