@@ -33,7 +33,7 @@ export default function RootLayout({
         <TansckQueryProvider>
           <div className="flex flex-col items-center">
             <DashboardHeader />
-            <main className="pt-18 w-[1200px] mb-[186px]">{children}</main>
+            <main className="pt-18 w-[1200px] mb-[132px]">{children}</main>
             <DashboardFooter />
           </div>
         </TansckQueryProvider>
