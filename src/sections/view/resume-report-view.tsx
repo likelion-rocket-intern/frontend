@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense } from "react";
 import client from "@/app/lib/client";
 import { useParams } from "next/navigation";
 import { MOCK_RESUME_RESULT } from "@/constants/resume";
@@ -11,6 +11,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useQuery } from "@tanstack/react-query";
+import PulseLoader from "react-spinners/ClipLoader";
 
 type JobFitness = {
   name: string;
@@ -19,15 +21,23 @@ type JobFitness = {
 };
 
 type ResumeEvaluation = {
-  score: number;
-  category: string;
-  attribute: string;
-  description: string;
+  strengths: {
+    score: number;
+    category: string;
+    attribute: string;
+    description: string;
+  }[];
+  weaknesses: {
+    score: number;
+    category: string;
+    attribute: string;
+    description: string;
+  }[];
 };
 
 type AnalysisResult = {
   job_fitness: JobFitness[];
-  resume_evaluation: ResumeEvaluation[];
+  resume_evaluation: ResumeEvaluation;
 };
 
 type ResumeDetailResponse = {
@@ -42,49 +52,65 @@ type ResumeDetailResponse = {
   created_at: string;
 };
 
-async function getResumeDetail(
-  resumeId: number
-): Promise<ResumeDetailResponse> {
-  const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
-    params: {
-      path: {
-        resume_id: resumeId,
-      },
-    },
-  });
-  if (error) throw new Error("API 요청 실패");
-  return data as ResumeDetailResponse;
-}
-
 export default function ResumeReportView() {
   const params = useParams();
-  const resumeId = params?.id ? Number(params.id) : undefined;
-  const [resumeDetail, setResumeDetail] = useState<ResumeDetailResponse | null>(
-    null
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const resume_id = Number(params.id);
 
-  useEffect(() => {
-    if (!resumeId) return;
-    setLoading(true);
-    getResumeDetail(resumeId)
-      .then((data) => setResumeDetail(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [resumeId]);
+  // 현재 유저 정보
+  const { data: currentUser } = useQuery({
+    queryKey: ["api", "v1", "auth", "me"],
+    queryFn: async () => {
+      try {
+        const { data, error } = await client.GET("/api/v1/auth/me", {});
+        if (error) throw new Error("유저 정보 가져오기 실패");
+        return data;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  });
 
-  // analysis_result가 문자열이면 파싱
-  const analysisResult =
+  // 이력서 분석 상세 정보
+  const { data: resumeDetail, isLoading } = useQuery({
+    queryKey: ["api", "v1", "resume", resume_id],
+    queryFn: async () => {
+      try {
+        setTimeout(() => {}, 1000);
+        const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
+          params: {
+            path: {
+              resume_id,
+            },
+          },
+        });
+        if (error) throw new Error("이력서 분석 상세 정보 가져오기 실패");
+        return data;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    enabled: typeof resume_id === "number",
+  });
+
+  // 로딩 상태 관리
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center">
+        <PulseLoader
+          color="#ff7710" // 스피너 색상
+          loading={true} // 로딩 여부
+          size={70} // 크기(px)
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
+
+  // 반환된 데이터가 string일 경우 파싱
+  const parsedResult: AnalysisResult =
     typeof resumeDetail?.analysis_result === "string"
-      ? (JSON.parse(resumeDetail.analysis_result) as AnalysisResult)
-      : (resumeDetail?.analysis_result as AnalysisResult);
-
-  // if (loading) return <div className="text-center py-10">불러오는 중...</div>;
-  // if (error)
-  //   return <div className="text-center py-10 text-red-500">{error}</div>;
-  // if (!resumeDetail || !analysisResult)
-  //   return <div className="text-center py-10">데이터가 없습니다.</div>;
+      ? JSON.parse(resumeDetail.analysis_result)
+      : resumeDetail?.analysis_result;
 
   // 직무 적합성 그래프 색상
   const graphStyle = [
@@ -97,10 +123,10 @@ export default function ResumeReportView() {
   ];
 
   // 적합 직무 렌더링
-  const renderJobFit = MOCK_RESUME_RESULT.job_fitness
+  const renderJobFit = parsedResult?.job_fitness
     .filter((_, index) => index < 6)
     .map((job, index) => {
-      const firstFitScore = MOCK_RESUME_RESULT.job_fitness[0].score;
+      const firstFitScore = parsedResult?.job_fitness[0].score;
 
       return (
         <article
@@ -150,7 +176,7 @@ export default function ResumeReportView() {
     });
 
   // 장점 렌더링
-  const renderStrengths = MOCK_RESUME_RESULT.resume_evaluation.strengths
+  const renderStrengths = parsedResult?.resume_evaluation.strengths
     .filter((_, index) => index < 6)
     .map((item, i) => (
       <article
@@ -165,7 +191,7 @@ export default function ResumeReportView() {
     ));
 
   // 단점 렌더링
-  const renderWeekness = MOCK_RESUME_RESULT.resume_evaluation.weaknesses
+  const renderWeekness = parsedResult?.resume_evaluation.weaknesses
     .filter((_, index) => index < 6)
     .map((item, i) => (
       <article key={i} className="bg-gray-25 rounded-[10px] p-4 space-y-3">
@@ -185,7 +211,7 @@ export default function ResumeReportView() {
             <div className="size-38 bg-gray-300"></div>
             <div>
               <h3 className="title_1 text-gray-500 mb-1">
-                고구마 오억오천개먹기
+                {currentUser?.nickname}
               </h3>
               <p className="body_2 text-gray-400">dlsmdfur37@email.com</p>
             </div>
