@@ -1,4 +1,4 @@
-const MOCK_RESUME_RESULT = {
+export const MOCK_RESUME_RESULT = {
   job_fitness: [
     {
       name: "사업개발 매니저",
@@ -113,4 +113,26 @@ const MOCK_RESUME_RESULT = {
       },
     ],
   },
+  resume_suggestion: [
+    {
+      title: "이력서 작성시",
+      description:
+        "대규모 트래픽 환경에서 쿼리 튜닝, 캐싱 전략, 비동기 처리 등으로 시스템 응답 속도 개선 및 서버 부하 감소 경험",
+    },
+    {
+      title: "이력서 작성시",
+      description:
+        "대규모 트래픽 환경에서 쿼리 튜닝, 캐싱 전략, 비동기 처리 등으로 시스템 응답 속도 개선 및 서버 부하 감소 경험",
+    },
+    {
+      title: "이력서 작성시",
+      description:
+        "대규모 트래픽 환경에서 쿼리 튜닝, 캐싱 전략, 비동기 처리 등으로 시스템 응답 속도 개선 및 서버 부하 감소 경험",
+    },
+    {
+      title: "이력서 작성시",
+      description:
+        "대규모 트래픽 환경에서 쿼리 튜닝, 캐싱 전략, 비동기 처리 등으로 시스템 응답 속도 개선 및 서버 부하 감소 경험",
+    },
+  ],
 };

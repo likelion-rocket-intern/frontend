@@ -27,7 +27,7 @@ export function KakaoLoginButton() {
     <Button
       onClick={handleKakaoLogin}
       size={"large"}
-      className="bg-[#FFE300] text-gray-800 hover:bg-[#F0D600]"
+      className="bg-[#FFE300] text-gray-800 hover:bg-[#F0D600] active:bg-[#FFE300]"
     >
       <SvgColor src="/icons/icon-message-circle.svg" width={21} height={21} />
       카카오톡으로 시작하기
