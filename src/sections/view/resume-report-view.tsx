@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import client from "@/app/lib/client";
 import { useParams } from "next/navigation";
 import { MOCK_RESUME_RESULT } from "@/constants/resume";
@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
-import ClipLoader from "react-spinners/ClipLoader";
+import PulseLoader from "react-spinners/ClipLoader";
 
 type JobFitness = {
   name: string;
@@ -56,12 +56,22 @@ export default function ResumeReportView() {
   const params = useParams();
   const resume_id = Number(params.id);
 
+  // 현재 유저 정보
+  const { data: currentUser } = useQuery({
+    queryKey: ["api", "v1", "auth", "me"],
+    queryFn: async () => {
+      try {
+        const { data, error } = await client.GET("/api/v1/auth/me", {});
+        if (error) throw new Error("유저 정보 가져오기 실패");
+        return data;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  });
+
   // 이력서 분석 상세 정보
-  const {
-    data: resumeDetail,
-    error,
-    isLoading,
-  } = useQuery({
+  const { data: resumeDetail, isLoading } = useQuery({
     queryKey: ["api", "v1", "resume", resume_id],
     queryFn: async () => {
       try {
@@ -73,7 +83,7 @@ export default function ResumeReportView() {
             },
           },
         });
-        if (error) throw new Error("API 요청 실패");
+        if (error) throw new Error("이력서 분석 상세 정보 가져오기 실패");
         return data;
       } catch (err) {
         console.error(err);
@@ -81,6 +91,20 @@ export default function ResumeReportView() {
     },
     enabled: typeof resume_id === "number",
   });
+
+  // 로딩 상태 관리
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center">
+        <PulseLoader
+          color="#ff7710" // 스피너 색상
+          loading={true} // 로딩 여부
+          size={70} // 크기(px)
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
 
   // 반환된 데이터가 string일 경우 파싱
   const parsedResult: AnalysisResult =
@@ -97,19 +121,6 @@ export default function ResumeReportView() {
     "bg-primary-100",
     "bg-primary-50",
   ];
-
-  if (isLoading)
-    return (
-      <div className="flex justify-center">
-        <ClipLoader
-          color="#36d7b7" // 스피너 색상
-          loading={true} // 로딩 여부
-          size={50} // 크기(px)
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      </div>
-    );
 
   // 적합 직무 렌더링
   const renderJobFit = parsedResult?.job_fitness
@@ -165,7 +176,7 @@ export default function ResumeReportView() {
     });
 
   // 장점 렌더링
-  const renderStrengths = parsedResult.resume_evaluation.strengths
+  const renderStrengths = parsedResult?.resume_evaluation.strengths
     .filter((_, index) => index < 6)
     .map((item, i) => (
       <article
@@ -180,7 +191,7 @@ export default function ResumeReportView() {
     ));
 
   // 단점 렌더링
-  const renderWeekness = parsedResult.resume_evaluation.weaknesses
+  const renderWeekness = parsedResult?.resume_evaluation.weaknesses
     .filter((_, index) => index < 6)
     .map((item, i) => (
       <article key={i} className="bg-gray-25 rounded-[10px] p-4 space-y-3">
@@ -200,7 +211,7 @@ export default function ResumeReportView() {
             <div className="size-38 bg-gray-300"></div>
             <div>
               <h3 className="title_1 text-gray-500 mb-1">
-                고구마 오억오천개먹기
+                {currentUser?.nickname}
               </h3>
               <p className="body_2 text-gray-400">dlsmdfur37@email.com</p>
             </div>
