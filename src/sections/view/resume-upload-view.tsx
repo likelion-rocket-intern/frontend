@@ -117,7 +117,7 @@ export default function ResumeUploadView() {
         if (taskStatus.result?.resume_id) {
           router.push(`/resume/report/${taskStatus.result.resume_id}`);
         }
-      } else {
+      } else if (taskStatus.status === "failed") {
         console.error("분석 실패!");
         // 🎯 실패 처리
       }
@@ -132,9 +132,9 @@ export default function ResumeUploadView() {
     await analysisMutation.mutate(formData);
   };
 
+  // 이력서 업로드 섹션
   const renderUploadTab = (
     <TabsContent value="upload">
-      {/* 이력서 업로드 섹션 */}
       <section>
         <div className="flex justify-between mb-8">
           <h1 className="text-[32px] text-[#777777]">
