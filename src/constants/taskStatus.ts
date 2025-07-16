@@ -6,5 +6,5 @@ export const TASK_STATUS_MESSAGE = {
   saving: "이력서를 저장중이에요",
   scoring: "이력서를 기반으로 적합한 직무를 찾고 있어요",
   completed: "곧 분석 결과를 볼 수 있어요. 조금만 더 기다려주세요!",
-  failed: "이력서 분석에 실패했어요. 잠시 후 다시 시도해주세요.",
+  failed: "이력서 분석에 실패했어요",
 };

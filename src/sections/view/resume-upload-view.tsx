@@ -260,6 +260,7 @@ export default function ResumeUploadView() {
         onClose={() => setIsModalOpen(false)}
         title={taskStatusMessage}
         image={<p>이미지</p>}
+        handleFileUpload={() => handleFileSelectClick()}
       />
     </div>
   );
