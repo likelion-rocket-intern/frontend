@@ -21,6 +21,7 @@ const buttonVariants = cva(
           "text-primary-600 hover:text-primary-800 active:text-primary-300 disabled:text-gray-300",
         link_default:
           "text-gray-500 hover:text-gray-600 active:text-gray-400 disabled:text-gray-300",
+        loading: "text-white bg-gray-400 cursor-not-allowed",
       },
       size: {
         fit: "text-[16px] font-semibold leading-[1.4] tracking-[-0.4px]",

@@ -35,6 +35,10 @@
   --color-error-50: #fff7f7;
   --color-error-500: #ff6161;
 
+  /* Blue colors */
+  --color-blue: #4a83ff;
+  --color-blue-2: #f1f5ff;
+
   /* shadows */
   --shadow-shadow-2: 1px 0.6px 3px 0px rgba(0, 0, 0, 0.03),
     0px 2px 10px 0px rgba(0, 0, 0, 0.08);

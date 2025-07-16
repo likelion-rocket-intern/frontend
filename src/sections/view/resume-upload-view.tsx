@@ -56,6 +56,12 @@ export default function ResumeUploadView() {
     fileInputRef.current?.click();
   };
 
+  // 페이지 진입시 이전 상태 초기화
+  useEffect(() => {
+    setTask_id("");
+    setShouldPoll(true);
+  }, []);
+
   // form 관리
   const defaultValues = {
     file: undefined,
@@ -136,6 +142,8 @@ export default function ResumeUploadView() {
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
     setIsModalOpen(true);
     // 분석 요청
+    setTask_id(""); // 이전 task 초기화
+    setIsModalOpen(true);
     await analysisMutation.mutate(formData);
   };
 
@@ -175,8 +183,9 @@ export default function ResumeUploadView() {
                   <Label htmlFor="resumeUpload" className="block w-full">
                     <div
                       className={clsx(
-                        "flex flex-col justify-center items-center rounded-[10px] h-[138px] space-y-[6px] mb-[10px] transition-colors",
-                        values.file !== undefined && "bg-[#FFFAF7]",
+                        "flex flex-col justify-center items-center rounded-[10px] h-[385px] space-y-[6px] mb-[10px] transition-colors",
+                        values.file !== undefined &&
+                          "bg-blue-2 text-blue border border-blue",
                         fieldState.invalid
                           ? "bg-[#FFF9F9] border border-[#FF6161] text-[#F45C5C]"
                           : "bg-[#F8F8F8] border border-[#CAC8C8] text-[#767676]"
@@ -248,9 +257,19 @@ export default function ResumeUploadView() {
           </Tabs>
 
           <section className="flex w-full justify-end space-x-6">
-            <Button type="submit" variant={"default_primary"} size={"large"}>
-              {isSubmitting ? "이력서를 분석 중입니다" : "이력서 분석하기"}
-            </Button>
+            {analysisMutation.isPending ? (
+              <Button variant={"loading"} className="w-[320px] h-[72px]">
+                이력서 분석중
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                variant={"default_primary"}
+                className="w-[320px] h-[72px]"
+              >
+                이력서 분석하기
+              </Button>
+            )}
           </section>
         </form>
       </Form>

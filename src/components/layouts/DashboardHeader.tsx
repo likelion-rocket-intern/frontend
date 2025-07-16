@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <header className="flex items-center justify-between h-20 w-full px-40 border-b border-gray-300">
@@ -28,8 +29,12 @@ export default function DashboardHeader() {
           <Button asChild variant="link_default" size={"fit"}>
             <Link href={paths.aptitude.test}>적성검사</Link>
           </Button>
-          <Button asChild variant="link_default" size={"fit"}>
-            <Link href={paths.resume.upload}>이력서분석</Link>
+          <Button
+            variant="link_default"
+            size={"fit"}
+            onClick={() => router.push(paths.resume.upload)}
+          >
+            이력서분석
           </Button>
           <Button asChild variant="link_default" size={"fit"}>
             <Link href={paths.mypage}>마이페이지</Link>
