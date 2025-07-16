@@ -14,15 +14,10 @@ type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  children: React.ReactNode;
+  image: React.ReactNode;
 };
 
-export default function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-}: ModalProps) {
+export default function Modal({ isOpen, onClose, title, image }: ModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -39,8 +34,8 @@ export default function Modal({
           <div className="fixed inset-0 bg-black/30" />
         </TransitionChild>
 
-        {/* 모달 박스 */}
-        <div className="fixed inset-0 flex items-center justify-center p-4 w-full">
+        {/* 모달 배경 */}
+        <div className="fixed inset-0 flex items-center justify-center w-full">
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -50,24 +45,23 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel
-              className={`w-[900px] transform rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all`}
-            >
-              {/* 타이틀 */}
-              <div className="flex justify-between items-center mb-4">
-                <DialogTitle className="text-lg font-medium text-gray-900">
-                  {title}
-                </DialogTitle>
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
+            {/* 모달 박스 */}
+            <DialogPanel className="relative w-[900px] transform rounded-[20px] bg-white p-5 transition-all">
+              <button
+                onClick={onClose}
+                className="absolute text-gray-400 hover:text-gray-600 top-5 right-5 cursor-pointer"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+              <div className="flex flex-col gap-8 items-center mx-[156px] my-[146px] w-[588px] h-[308px]">
+                <div className="size-[236px] bg-gray-300">{image}</div>
+                {/* 타이틀 */}
+                <div className="flex justify-between items-center mb-4">
+                  <DialogTitle className="title_1 text-gray-600">
+                    {title}
+                  </DialogTitle>
+                </div>
               </div>
-
-              {/* 콘텐츠 */}
-              <div>{children}</div>
             </DialogPanel>
           </TransitionChild>
         </div>

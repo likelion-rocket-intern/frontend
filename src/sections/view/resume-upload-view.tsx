@@ -3,9 +3,7 @@
 import { z as zod } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useMutation, useQuery } from "@tanstack/react-query";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,16 +16,16 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-
 import { SvgColor } from "@/components/svg-color";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
 import { useRouter } from "next/navigation";
-import { paths } from "@/app/lib/schema";
 import type { components } from "@/app/lib/schema";
+import { TASK_STATUS_MESSAGE } from "@/constants/taskStatus";
 
+type StatusKey = keyof typeof TASK_STATUS_MESSAGE;
 type TaskStatusResponse = components["schemas"]["TaskStatusResponse"];
 
 export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
@@ -47,10 +45,11 @@ const ResumeUploadSchema = zod.object({
 
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [task_id, setTask_id] = useState<string>("");
   const router = useRouter();
-  const [shouldPoll, setShouldPoll] = useState(true);
+  const [shouldPoll, setShouldPoll] = useState<boolean>(true);
+  const [taskStatusMessage, setTaskStatusMessage] = useState<string>("");
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -101,33 +100,41 @@ export default function ResumeUploadView() {
     refetchInterval: 1000, // 1초마다 폴링
   });
 
-  // task status 로깅 및 폴링 제어
+  // task status 상태관리 및 폴링 제어
   useEffect(() => {
     if (!taskStatus) return;
-
-    console.log("현재 상태:", taskStatus.status);
+    // 상태 설정
+    setTaskStatusMessage(
+      TASK_STATUS_MESSAGE[taskStatus.status as StatusKey] ??
+        "이력서 상태를 가져올 수 없습니다. 다시 시도해주세요."
+    );
 
     // 완료 또는 실패 시 폴링 중단
     if (taskStatus.status === "completed" || taskStatus.status === "failed") {
       setShouldPoll(false); // 폴링 중단
 
+      // 🎯 완료 처리 (페이지 이동)
       if (taskStatus.status === "completed") {
-        console.log("분석 완료! 결과:", taskStatus);
-        // 🎯 완료 처리 (페이지 이동)
+        setTaskStatusMessage(
+          TASK_STATUS_MESSAGE[taskStatus.status as StatusKey]
+        );
         if (taskStatus.result?.resume_id) {
+          // 이력서 분석 결과 상세 페이지로 이동
           router.push(`/resume/report/${taskStatus.result.resume_id}`);
         }
       } else if (taskStatus.status === "failed") {
-        console.error("분석 실패!");
         // 🎯 실패 처리
+        setTaskStatusMessage(
+          TASK_STATUS_MESSAGE[taskStatus.status as StatusKey] ??
+            "이력서 상태를 가져올 수 없습니다. 다시 시도해주세요."
+        );
       }
     }
   }, [taskStatus, router]);
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
-    // setIsModalOpen(true);
-    // console.log(formData);
+    setIsModalOpen(true);
     // 분석 요청
     await analysisMutation.mutate(formData);
   };
@@ -251,10 +258,9 @@ export default function ResumeUploadView() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="이력서 분석"
-      >
-        <p className="mb-4">이력서를 분석중입니다.</p>
-      </Modal>
+        title={taskStatusMessage}
+        image={<p>이미지</p>}
+      />
     </div>
   );
 }
