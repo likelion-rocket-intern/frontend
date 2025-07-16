@@ -52,6 +52,14 @@ type ResumeDetailResponse = {
   created_at: string;
 };
 
+const keywords = [
+  "이력서 키워드",
+  "이력서 키워드",
+  "이력서 키워드",
+  "이력서 키워드",
+  "이력서 키워드",
+];
+
 export default function ResumeReportView() {
   const params = useParams();
   const resume_id = Number(params.id);
@@ -71,7 +79,9 @@ export default function ResumeReportView() {
   });
 
   // 이력서 분석 상세 정보
-  const { data: resumeDetail, isLoading } = useQuery({
+  const { data: resumeDetail, isLoading } = useQuery<
+    ResumeDetailResponse | undefined
+  >({
     queryKey: ["api", "v1", "resume", resume_id],
     queryFn: async () => {
       try {
@@ -111,6 +121,21 @@ export default function ResumeReportView() {
     typeof resumeDetail?.analysis_result === "string"
       ? JSON.parse(resumeDetail.analysis_result)
       : resumeDetail?.analysis_result;
+
+  // 시간 포매팅
+  const getFormattedDate = (isoString: string | undefined) => {
+    if (isoString) {
+      const date = new Date(isoString);
+      const formatted = date
+        .toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replace(/\./g, ". ");
+      return formatted;
+    }
+  };
 
   // 직무 적합성 그래프 색상
   const graphStyle = [
@@ -218,15 +243,29 @@ export default function ResumeReportView() {
           </article>
 
           {/* 요약 */}
-          <article className="flex-1 bg-gray-25 rounded-[10px] p-6 space-y-[10px]">
-            <blockquote className="body_1 text-center text-gray-500 h-[84px] mt-[30px]">
-              “이력서 요약”
-            </blockquote>
-            <p className="text-gray-500 body_1">
-              강점: 성능 최적화, 문제 해결, 자기주도 학습, 책임감 등
-            </p>
-            <p className="text-gray-500 body_1">약점: 이러한 요약1줄</p>
-          </article>
+          <div className="flex flex-col gap-6 justify-center items-center w-full p-6 rounded-[10px] border border-gray-200 shadow-shadow-2 bg-white">
+            {/* 제목 */}
+            <div className="text-center">
+              <h2 className="title_1 text-gray-500">
+                {resumeDetail?.original_filename}
+              </h2>
+              <p className="text-gray-400 body_2">{`업로드 완료 ${getFormattedDate(
+                resumeDetail?.created_at
+              )}`}</p>
+            </div>
+
+            {/* 키워드 리스트 */}
+            <div className="flex flex-wrap justify-center gap-3">
+              {keywords.map((keyword, i) => (
+                <span
+                  key={i}
+                  className="px-4 py-2 rounded-full bg-primary-100 text-gray-600 button"
+                >
+                  {keyword}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
