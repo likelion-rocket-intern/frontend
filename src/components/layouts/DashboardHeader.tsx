@@ -1,60 +1,55 @@
+"use client";
+
 import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
 import { paths } from "@/routes/paths";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
+  const pathname = usePathname();
+  const router = useRouter();
+
   return (
     <header className="flex items-center justify-between h-20 w-full px-40 border-b border-gray-300">
       {/* left section */}
       <section className="flex gap-[70px]">
-        <Link href={paths.root}>
+        <Link href={paths.root} className="flex items-center">
           <SvgColor
             src="/logo/logo_likelion_primary_24_ver3_color.svg"
             width={234}
+            height={26}
             className="text-primary-500"
           />
         </Link>
-        <NavigationMenu>
-          <NavigationMenuList className="flex gap-8 *:cursor-pointer font-semibold">
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.root}>홈</NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.aptitude.test}>
-                적성검사
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.resume.upload}>
-                이력서분석
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href={paths.mypage}>
-                마이페이지
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <div className="flex gap-8 font-semibold">
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.root}>홈</Link>
+          </Button>
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.aptitude.test}>적성검사</Link>
+          </Button>
+          <Button
+            variant="link_default"
+            size={"fit"}
+            onClick={() => router.push(paths.resume.upload)}
+          >
+            이력서분석
+          </Button>
+          <Button asChild variant="link_default" size={"fit"}>
+            <Link href={paths.mypage}>마이페이지</Link>
+          </Button>
+        </div>
       </section>
 
       {/* right section */}
       <section className="flex items-center gap-6">
-        <Link
-          href={paths.mypage}
-          className="size-7 rounded-full bg-slate-300"
-        ></Link>
-        <p>회원가입</p>
-        <Button className="px-5 py-[10px] rounded-[8px] bg-[#FB923C]">
-          로그인
-        </Button>
+        {pathname !== "/login" && (
+          <Link
+            href={paths.mypage}
+            className="size-7 rounded-full bg-slate-300"
+          ></Link>
+        )}
       </section>
     </header>
   );

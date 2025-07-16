@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TansckQueryProvider from "@/providers/TanstackQueryProvider";
+import DashboardHeader from "@/components/layouts/DashboardHeader";
+import DashboardFooter from "@/components/layouts/DashboardFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +30,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TansckQueryProvider>{children}</TansckQueryProvider>
+        <TansckQueryProvider>
+          <div className="flex flex-col items-center">
+            <DashboardHeader />
+            <main className="pt-18 w-[1200px] mb-[132px]">{children}</main>
+            <DashboardFooter />
+          </div>
+        </TansckQueryProvider>
       </body>
     </html>
   );

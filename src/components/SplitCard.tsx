@@ -28,10 +28,7 @@ export default function SplitCard({
         </CardTitle>
         <CardDescription className="body_1">{cardDescription}</CardDescription>
       </CardHeader>
-      <Button
-        className="py-5 text-[24px] font-semibold leading-[32px] tracking-[-0.144px] cursor-pointer"
-        onClick={cardAction}
-      >
+      <Button variant={"default_primary"} size={"large"} onClick={cardAction}>
         {cardActionText}
       </Button>
     </Card>

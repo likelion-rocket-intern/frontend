@@ -3,9 +3,7 @@
 import { z as zod } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useMutation, useQuery } from "@tanstack/react-query";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,16 +16,16 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-
 import { SvgColor } from "@/components/svg-color";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
 import { useRouter } from "next/navigation";
-import { paths } from "@/app/lib/schema";
 import type { components } from "@/app/lib/schema";
+import { TASK_STATUS_MESSAGE } from "@/constants/taskStatus";
 
+type StatusKey = keyof typeof TASK_STATUS_MESSAGE;
 type TaskStatusResponse = components["schemas"]["TaskStatusResponse"];
 
 export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
@@ -47,15 +45,22 @@ const ResumeUploadSchema = zod.object({
 
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [task_id, setTask_id] = useState<string>("");
   const router = useRouter();
-  const [shouldPoll, setShouldPoll] = useState(true);
+  const [shouldPoll, setShouldPoll] = useState<boolean>(true);
+  const [taskStatusMessage, setTaskStatusMessage] = useState<string>("");
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
     fileInputRef.current?.click();
   };
+
+  // 페이지 진입시 이전 상태 초기화
+  useEffect(() => {
+    setTask_id("");
+    setShouldPoll(true);
+  }, []);
 
   // form 관리
   const defaultValues = {
@@ -101,50 +106,56 @@ export default function ResumeUploadView() {
     refetchInterval: 1000, // 1초마다 폴링
   });
 
-  // task status 로깅 및 폴링 제어
+  // task status 상태관리 및 폴링 제어
   useEffect(() => {
     if (!taskStatus) return;
-
-    console.log("현재 상태:", taskStatus.status);
+    // 상태 설정
+    setTaskStatusMessage(
+      TASK_STATUS_MESSAGE[taskStatus.status as StatusKey] ??
+        "이력서 상태를 가져올 수 없습니다. 다시 시도해주세요."
+    );
 
     // 완료 또는 실패 시 폴링 중단
     if (taskStatus.status === "completed" || taskStatus.status === "failed") {
       setShouldPoll(false); // 폴링 중단
 
+      // 🎯 완료 처리 (페이지 이동)
       if (taskStatus.status === "completed") {
-        console.log("분석 완료! 결과:", taskStatus);
-        // 🎯 완료 처리 (페이지 이동)
+        setTaskStatusMessage(
+          TASK_STATUS_MESSAGE[taskStatus.status as StatusKey]
+        );
         if (taskStatus.result?.resume_id) {
+          // 이력서 분석 결과 상세 페이지로 이동
           router.push(`/resume/report/${taskStatus.result.resume_id}`);
         }
-      } else {
-        console.error("분석 실패!");
+      } else if (taskStatus.status === "failed") {
         // 🎯 실패 처리
+        setTaskStatusMessage(
+          TASK_STATUS_MESSAGE[taskStatus.status as StatusKey] ??
+            "이력서 상태를 가져올 수 없습니다. 다시 시도해주세요."
+        );
       }
     }
   }, [taskStatus, router]);
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
-    // setIsModalOpen(true);
-    // console.log(formData);
+    setIsModalOpen(true);
     // 분석 요청
+    setTask_id(""); // 이전 task 초기화
+    setIsModalOpen(true);
     await analysisMutation.mutate(formData);
   };
 
+  // 이력서 업로드 섹션
   const renderUploadTab = (
     <TabsContent value="upload">
-      {/* 이력서 업로드 섹션 */}
       <section>
         <div className="flex justify-between mb-8">
           <h1 className="text-[32px] text-[#777777]">
             이력서를 업로드해주세요
           </h1>
-          <Button
-            type="button"
-            onClick={() => handleFileSelectClick()}
-            className="py-2 px-4 leading-none h-[38px]"
-          >
+          <Button type="button" onClick={() => handleFileSelectClick()}>
             파일 선택
           </Button>
         </div>
@@ -172,8 +183,9 @@ export default function ResumeUploadView() {
                   <Label htmlFor="resumeUpload" className="block w-full">
                     <div
                       className={clsx(
-                        "flex flex-col justify-center items-center rounded-[10px] h-[138px] space-y-[6px] mb-[10px] transition-colors",
-                        values.file !== undefined && "bg-[#FFFAF7]",
+                        "flex flex-col justify-center items-center rounded-[10px] h-[385px] space-y-[6px] mb-[10px] transition-colors",
+                        values.file !== undefined &&
+                          "bg-blue-2 text-blue border border-blue",
                         fieldState.invalid
                           ? "bg-[#FFF9F9] border border-[#FF6161] text-[#F45C5C]"
                           : "bg-[#F8F8F8] border border-[#CAC8C8] text-[#767676]"
@@ -184,8 +196,8 @@ export default function ResumeUploadView() {
                           {fieldState.error
                             ? fieldState.error.message
                             : values.file === undefined
-                              ? "파일을 업로드 해주세요"
-                              : values.file.name}
+                            ? "파일을 업로드 해주세요"
+                            : values.file.name}
                         </p>
                         <SvgColor src="/icons/icon-upload.svg" />
                       </div>
@@ -244,8 +256,20 @@ export default function ResumeUploadView() {
             {renderManualTab}
           </Tabs>
 
-          <section className="flex w-full justify-end space-x-6 *:w-[320px] *:h-[72px] *:py-5 *:px-4 *:rounded-[6px] *:text-2xl">
-            <Button type="submit">이력서 분석하기</Button>
+          <section className="flex w-full justify-end space-x-6">
+            {analysisMutation.isPending ? (
+              <Button variant={"loading"} className="w-[320px] h-[72px]">
+                이력서 분석중
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                variant={"default_primary"}
+                className="w-[320px] h-[72px]"
+              >
+                이력서 분석하기
+              </Button>
+            )}
           </section>
         </form>
       </Form>
@@ -253,10 +277,10 @@ export default function ResumeUploadView() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="이력서 분석"
-      >
-        <p className="mb-4">이력서를 분석중입니다.</p>
-      </Modal>
+        title={taskStatusMessage}
+        image={<p>이미지</p>}
+        handleFileUpload={() => handleFileSelectClick()}
+      />
     </div>
   );
 }
