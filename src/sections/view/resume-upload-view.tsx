@@ -3,7 +3,7 @@
 import { z as zod } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,7 @@ export type ResumeUploadSchemaType = zod.infer<typeof ResumeUploadSchema>;
 
 const ResumeUploadSchema = zod.object({
   file: zod
-    .instanceof(File, { message: "파일을 업로드 해주세요." })
+    .instanceof(File, { message: "파일을 업로드 해주세요" })
     .refine((file) => file.size > 0, {
       message: "빈 파일은 업로드할 수 없습니다.",
     })
@@ -50,6 +50,8 @@ export default function ResumeUploadView() {
   const router = useRouter();
   const [shouldPoll, setShouldPoll] = useState<boolean>(true);
   const [taskStatusMessage, setTaskStatusMessage] = useState<string>("");
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -57,10 +59,7 @@ export default function ResumeUploadView() {
   };
 
   // 페이지 진입시 이전 상태 초기화
-  useEffect(() => {
-    setTask_id("");
-    setShouldPoll(true);
-  }, []);
+  useEffect(() => {}, []);
 
   // form 관리
   const defaultValues = {
@@ -73,14 +72,7 @@ export default function ResumeUploadView() {
     defaultValues,
   });
 
-  const {
-    reset,
-    watch,
-    setValue,
-    handleSubmit,
-    getValues,
-    formState: { isSubmitting, errors },
-  } = methods;
+  const { reset, watch, setValue, handleSubmit, getValues } = methods;
 
   const values = watch();
   const manualResume = values.manualResume;
@@ -94,7 +86,10 @@ export default function ResumeUploadView() {
       setTask_id(task_id);
     },
     onError: (err) => {
-      console.error("분석 시작 실패:", err);
+      setTaskStatusMessage(
+        "이력서 업로드에 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
+      console.error(err);
     },
   });
 
@@ -124,10 +119,11 @@ export default function ResumeUploadView() {
         setTaskStatusMessage(
           TASK_STATUS_MESSAGE[taskStatus.status as StatusKey]
         );
-        if (taskStatus.result?.resume_id) {
-          // 이력서 분석 결과 상세 페이지로 이동
-          router.push(`/resume/report/${taskStatus.result.resume_id}`);
-        }
+        // 캐시 무효화
+        setTask_id("");
+        queryClient.removeQueries({ queryKey: ["task-status"] });
+        // 이력서 분석 결과 상세 페이지로 이동
+        router.push(`/resume/report/${taskStatus.result.resume_id}`);
       } else if (taskStatus.status === "failed") {
         // 🎯 실패 처리
         setTaskStatusMessage(
@@ -140,80 +136,79 @@ export default function ResumeUploadView() {
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
+    setIsSubmitting(true);
     setIsModalOpen(true);
-    // 분석 요청
-    setTask_id(""); // 이전 task 초기화
-    setIsModalOpen(true);
-    await analysisMutation.mutate(formData);
+
+    try {
+      await analysisMutation.mutateAsync(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 이력서 업로드 섹션
   const renderUploadTab = (
-    <TabsContent value="upload">
-      <section>
-        <div className="flex justify-between mb-8">
-          <h1 className="text-[32px] text-[#777777]">
-            이력서를 업로드해주세요
-          </h1>
-          <Button type="button" onClick={() => handleFileSelectClick()}>
-            파일 선택
-          </Button>
-        </div>
+    <section className="mb-20">
+      <div className="flex justify-between mb-8">
+        <h1 className="text-[32px] text-[#777777]">이력서를 업로드해주세요</h1>
+        <Button type="button" onClick={() => handleFileSelectClick()}>
+          파일 선택
+        </Button>
+      </div>
 
-        <FormField
-          control={methods.control}
-          name="file"
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormControl>
-                <div>
-                  <Input
-                    type="file"
-                    id="resumeUpload"
-                    accept=".pdf,.doc,.docx,.txt"
-                    className="hidden"
-                    ref={fileInputRef}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        field.onChange(file);
-                      }
-                    }}
-                  />
-                  <Label htmlFor="resumeUpload" className="block w-full">
-                    <div
-                      className={clsx(
-                        "flex flex-col justify-center items-center rounded-[10px] h-[385px] space-y-[6px] mb-[10px] transition-colors",
-                        values.file !== undefined &&
-                          "bg-blue-2 text-blue border border-blue",
-                        fieldState.invalid
-                          ? "bg-[#FFF9F9] border border-[#FF6161] text-[#F45C5C]"
-                          : "bg-[#F8F8F8] border border-[#CAC8C8] text-[#767676]"
-                      )}
-                    >
-                      <div className="flex gap-[6px] items-center">
-                        <p className="text-[22px]">
-                          {fieldState.error
-                            ? fieldState.error.message
-                            : values.file === undefined
-                            ? "파일을 업로드 해주세요"
-                            : values.file.name}
-                        </p>
-                        <SvgColor src="/icons/icon-upload.svg" />
-                      </div>
-                      <p>지원 가능한 파일 형식 안내: PDF, DOC, DOCX, TXT 등</p>
+      <FormField
+        control={methods.control}
+        name="file"
+        render={({ field, fieldState }) => (
+          <FormItem>
+            <FormControl>
+              <div>
+                <Input
+                  type="file"
+                  id="resumeUpload"
+                  accept=".pdf,.doc,.docx,.txt"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      field.onChange(file);
+                    }
+                  }}
+                />
+                <Label htmlFor="resumeUpload" className="block w-full">
+                  <div
+                    className={clsx(
+                      "flex flex-col justify-center items-center rounded-[10px] h-[385px] space-y-[6px] mb-[10px] transition-colors",
+                      values.file !== undefined &&
+                        "bg-blue-2 text-blue border border-blue",
+                      fieldState.invalid
+                        ? "bg-[#FFF9F9] border border-[#FF6161] text-[#F45C5C]"
+                        : "bg-[#F8F8F8] border border-[#CAC8C8] text-[#767676]"
+                    )}
+                  >
+                    <div className="flex gap-[6px] items-center">
+                      <p className="text-[22px]">
+                        {fieldState.error
+                          ? fieldState.error.message
+                          : values.file === undefined
+                          ? "파일을 업로드 해주세요"
+                          : values.file.name}
+                      </p>
+                      <SvgColor src="/icons/icon-upload.svg" />
                     </div>
-                  </Label>
-                  <p className="text-right text-xs text-[#767676]">
-                    최대 5mb 까지 업로드 가능합니다.
-                  </p>
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      </section>
-    </TabsContent>
+                    <p>지원 가능한 파일 형식 안내: PDF, DOC, DOCX, TXT 등</p>
+                  </div>
+                </Label>
+                <p className="text-right text-xs text-[#767676]">
+                  최대 5mb 까지 업로드 가능합니다.
+                </p>
+              </div>
+            </FormControl>
+          </FormItem>
+        )}
+      />
+    </section>
   );
 
   const renderManualTab = (
@@ -245,26 +240,21 @@ export default function ResumeUploadView() {
       <Form {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           {/* 이력서 작성 방식 선택 탭 */}
-          <Tabs defaultValue="upload" className="flex w-full mb-24">
-            <TabsList className="self-end mb-20">
-              <TabsTrigger value="upload">이력서 파일 업로드하기</TabsTrigger>
-              <TabsTrigger value="manual">새 이력서 작성하기</TabsTrigger>
-            </TabsList>
-
-            {renderUploadTab}
-
-            {renderManualTab}
-          </Tabs>
-
+          {renderUploadTab}
           <section className="flex w-full justify-end space-x-6">
-            {analysisMutation.isPending ? (
-              <Button variant={"loading"} className="w-[320px] h-[72px]">
+            {isSubmitting ? (
+              <Button
+                variant={"loading"}
+                size={"large"}
+                className="w-[320px] h-[72px]"
+              >
                 이력서 분석중
               </Button>
             ) : (
               <Button
                 type="submit"
                 variant={"default_primary"}
+                size={"large"}
                 className="w-[320px] h-[72px]"
               >
                 이력서 분석하기

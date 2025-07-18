@@ -148,82 +148,117 @@ export default function ResumeReportView() {
   ];
 
   // 적합 직무 렌더링
-  const renderJobFit = parsedResult?.job_fitness
-    .filter((_, index) => index < 6)
-    .map((job, index) => {
-      const firstFitScore = parsedResult?.job_fitness[0].score;
+  const renderJobFit = () => {
+    const jobFit = parsedResult?.job_fitness
+      .filter((_, index) => index < 6)
+      .map((job, index) => {
+        const firstFitScore = parsedResult?.job_fitness[0].score;
 
-      return (
-        <article
-          key={job.name}
-          className="group flex items-start gap-6 justify-between"
-        >
-          <div className="flex items-center h-full pt-[6px]">
-            <span className="text-gray-500 subtitle_1 size-8 mr-8">
-              {index + 1}
-            </span>
-            <span className="text-gray-600 body_1 w-40 text-center mr-6">
-              {job.name}
-            </span>
-            <div className="w-[338px]">
-              <div
-                style={
-                  index === 0
-                    ? { width: "100%" }
-                    : { width: `${(job.score / firstFitScore) * 338}px` }
-                }
-                className={clsx(
-                  "flex items-center px-6 py-4 rounded text-gray-600",
-                  graphStyle[index]
-                )}
-              >
-                <span className={clsx("button", index === 0 && "text-gray-25")}>
-                  {job.score}
-                </span>
+        return (
+          <article
+            key={job.name}
+            className="group flex items-start gap-6 justify-between"
+          >
+            <div className="flex items-center h-full pt-[6px]">
+              <span className="text-gray-500 subtitle_1 size-8 mr-8">
+                {index + 1}
+              </span>
+              <span className="text-gray-600 body_1 w-40 text-center mr-6">
+                {job.name}
+              </span>
+              <div className="w-[338px]">
+                <div
+                  style={
+                    index === 0
+                      ? { width: "100%" }
+                      : { width: `${(job.score / firstFitScore) * 338}px` }
+                  }
+                  className={clsx(
+                    "flex items-center px-6 py-4 rounded text-gray-600",
+                    graphStyle[index]
+                  )}
+                >
+                  <span
+                    className={clsx("button", index === 0 && "text-gray-25")}
+                  >
+                    {job.score}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <Accordion type="single" className="w-full h-full" collapsible>
-            <AccordionItem
-              value={`item-${index}`}
-              className="group flex flex-col flex-1 p-4 items-stretch rounded-[10px] border border-gray-200 h-full"
-            >
-              <AccordionTrigger className="cursor-pointer body_1 text-gray-500">
-                직무 설명
-              </AccordionTrigger>
-              <AccordionContent className="body_2 text-gray-600">
-                {job.skill}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </article>
-      );
-    });
+            <Accordion type="single" className="w-full h-full" collapsible>
+              <AccordionItem
+                value={`item-${index}`}
+                className="group flex flex-col flex-1 p-4 items-stretch rounded-[10px] border border-gray-200 h-full"
+              >
+                <AccordionTrigger className="cursor-pointer body_1 text-gray-500">
+                  직무 설명
+                </AccordionTrigger>
+                <AccordionContent className="body_2 text-gray-600">
+                  {job.skill}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </article>
+        );
+      });
+
+    if (jobFit.length > 0) {
+      return jobFit;
+    } else {
+      <div className="h-[138px] bg-error-50 border border-error-500 flex justify-center items-center">
+        <p className="subtitle_1 text-error-500">분석할 내용이 부족합니다.</p>
+        <p className="body_2 text-error-500">새로운 이력서를 등록해주세요.</p>
+      </div>;
+    }
+  };
 
   // 장점 렌더링
-  const renderStrengths = parsedResult?.resume_evaluation.strengths
-    .filter((_, index) => index < 6)
-    .map((item, i) => (
-      <article
-        key={i}
-        className="bg-white rounded-lg px-4 py-6 space-y-4 shadow-shadow-2"
-      >
-        <h4 className="subtitle_1 text-gray-700">{item.attribute}</h4>
-        <p className="text-gray-500 body_1 min-h-[124px] mb-[26px]">
-          {item.description}
-        </p>
-      </article>
-    ));
+  const renderStrengths = () => {
+    const strengths = parsedResult?.resume_evaluation.strengths
+      .filter((_, index) => index < 6)
+      .map((item, i) => (
+        <article
+          key={i}
+          className="bg-white rounded-lg px-4 py-6 space-y-4 shadow-shadow-2"
+        >
+          <h4 className="subtitle_1 text-gray-700">{item.attribute}</h4>
+          <p className="text-gray-500 body_1 min-h-[124px] mb-[26px]">
+            {item.description}
+          </p>
+        </article>
+      ));
+
+    if (strengths.length > 0) {
+      return strengths;
+    } else {
+      <div className="h-[138px] bg-error-50 border border-error-500 flex justify-center items-center">
+        <p className="subtitle_1 text-error-500">분석할 내용이 부족합니다.</p>
+        <p className="body_2 text-error-500">새로운 이력서를 등록해주세요.</p>
+      </div>;
+    }
+  };
 
   // 단점 렌더링
-  const renderWeekness = parsedResult?.resume_evaluation.weaknesses
-    .filter((_, index) => index < 6)
-    .map((item, i) => (
-      <article key={i} className="bg-gray-25 rounded-[10px] p-4 space-y-3">
-        <h4 className="subtitle_1 text-gray-600">{item.attribute}</h4>
-        <p className="text-gray-500 body_1">{item.description}</p>
-      </article>
-    ));
+  const renderWeekness = () => {
+    const weekness = parsedResult?.resume_evaluation.weaknesses
+      .filter((_, index) => index < 6)
+      .map((item, i) => (
+        <article key={i} className="bg-gray-25 rounded-[10px] p-4 space-y-3">
+          <h4 className="subtitle_1 text-gray-600">{item.attribute}</h4>
+          <p className="text-gray-500 body_1">{item.description}</p>
+        </article>
+      ));
+
+    if (weekness.length > 0) {
+      return weekness;
+    } else {
+      <div className="h-[138px] bg-error-50 border border-error-500 flex justify-center items-center">
+        <p className="subtitle_1 text-error-500">분석할 내용이 부족합니다.</p>
+        <p className="body_2 text-error-500">새로운 이력서를 등록해주세요.</p>
+      </div>;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-20">
@@ -238,7 +273,11 @@ export default function ResumeReportView() {
               <h3 className="title_1 text-gray-500 mb-1">
                 {currentUser?.nickname}
               </h3>
-              <p className="body_2 text-gray-400">dlsmdfur37@email.com</p>
+              <p className="body_2 text-gray-400">
+                {currentUser?.email
+                  ? currentUser?.email
+                  : "등록된 이메일이 없습니다."}
+              </p>
             </div>
           </article>
 
@@ -272,7 +311,7 @@ export default function ResumeReportView() {
       {/* 직무 추천 순위 */}
       <section className="space-y-8">
         <h2 className="title_2 text-gray-500">직무 추천 순위</h2>
-        <div className="space-y-4">{renderJobFit}</div>
+        <div className="space-y-4">{renderJobFit()}</div>
         <p className="p-6 body_1 text-gray-500 bg-gray-25 rounded-[20px] min-h-[138px]">
           이외 직무추천 내용
         </p>
@@ -284,13 +323,13 @@ export default function ResumeReportView() {
         {/* 장점 */}
         <div className="space-y-4">
           <h3 className="subtitle_1 text-gray-500">장점</h3>
-          <div className="grid grid-cols-3 gap-4">{renderStrengths}</div>
+          <div className="grid grid-cols-3 gap-4">{renderStrengths()}</div>
         </div>
 
         {/* 단점 */}
         <div className="space-y-4">
           <h3 className="subtitle_1 text-gray-500">단점</h3>
-          <div className="space-y-6">{renderWeekness}</div>
+          <div className="space-y-6">{renderWeekness()}</div>
         </div>
       </section>
 
