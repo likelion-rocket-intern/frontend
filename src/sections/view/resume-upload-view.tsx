@@ -51,6 +51,7 @@ export default function ResumeUploadView() {
   const [shouldPoll, setShouldPoll] = useState<boolean>(true);
   const [taskStatusMessage, setTaskStatusMessage] = useState<string>("");
   const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -135,11 +136,14 @@ export default function ResumeUploadView() {
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
+    setIsSubmitting(true);
     setIsModalOpen(true);
-    // 분석 요청
-    setTask_id(""); // 이전 task 초기화
-    setIsModalOpen(true);
-    await analysisMutation.mutate(formData);
+
+    try {
+      await analysisMutation.mutateAsync(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 이력서 업로드 섹션
@@ -238,7 +242,7 @@ export default function ResumeUploadView() {
           {/* 이력서 작성 방식 선택 탭 */}
           {renderUploadTab}
           <section className="flex w-full justify-end space-x-6">
-            {analysisMutation.isPending ? (
+            {isSubmitting ? (
               <Button
                 variant={"loading"}
                 size={"large"}
