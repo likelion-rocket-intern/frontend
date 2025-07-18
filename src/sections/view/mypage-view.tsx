@@ -66,74 +66,94 @@ export default function MypageView() {
           {/* 종합결과 섹션 */}
           <section className="space-y-[54px] mb-20">
             <h2 className="title_1 text-[#767676]">종합결과</h2>
-            <div className="flex flex-col items-center justify-center bg-[url('/images/match_keywords.png')] h-[588px] bg-contain bg-no-repeat bg-center">
-              <div className="w-[384px]">
-                <h2 className="title_2 text-gray-600 mb-8 text-center">
-                  기업과 나의 핵심 키워드 찾기
-                </h2>
-                <Controller
-                  name="link"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <div className="mb-8">
-                      <div
-                        className={clsx(
-                          "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
-                          fieldState.invalid
-                            ? "ring-error-500"
-                            : "ring-primary-400"
-                        )}
-                      >
-                        <SvgColor
-                          src="/icons/icon-link.svg"
-                          width={24}
-                          height={24}
-                          className="text-gray-400"
-                        />
-                        <Input
-                          {...field}
+            <div className="relative flex justify-center items-center h-[588px]">
+              {/* 왼쪽 원 */}
+              <div className="absolute left-1/6 translate-x-[-50%] flex flex-col items-center">
+                <span className="text-gray-500 title_1 mb-4">
+                  기업이 원하는 역량
+                </span>
+                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
+                  keyword
+                </div>
+              </div>
+
+              {/* 오른쪽 원 */}
+              <div className="absolute right-1/6 translate-x-[50%] flex flex-col items-center">
+                <span className="text-gray-500 title_1 mb-4">나의 역량</span>
+                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
+                  keyword
+                </div>
+              </div>
+
+              {/* 가운데 큰 원 */}
+              <div className="relative size-[588px] rounded-full border border-orange-500 bg-orange-300/15 flex justify-center items-center">
+                <div className="w-[384px]">
+                  <h2 className="title_2 text-gray-600 mb-8 text-center">
+                    기업과 나의 핵심 키워드 찾기
+                  </h2>
+                  <Controller
+                    name="link"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div className="mb-8">
+                        <div
                           className={clsx(
-                            "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
+                            "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
                             fieldState.invalid
-                              ? "placeholder:text-error-500"
-                              : "placeholder:text-gray-400"
+                              ? "ring-error-500"
+                              : "ring-primary-400"
                           )}
-                          placeholder="채용공고 링크 입력"
-                        />
+                        >
+                          <SvgColor
+                            src="/icons/icon-link.svg"
+                            width={24}
+                            height={24}
+                            className="text-gray-400"
+                          />
+                          <Input
+                            {...field}
+                            className={clsx(
+                              "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
+                              fieldState.invalid
+                                ? "placeholder:text-error-500"
+                                : "placeholder:text-gray-400"
+                            )}
+                            placeholder="채용공고 링크 입력"
+                          />
+                        </div>
+                        <p
+                          className={clsx(
+                            "body_2",
+                            fieldState.invalid
+                              ? "text-error-500"
+                              : "text-gray-400"
+                          )}
+                        >
+                          링크를 입력하고 이력서와 적성검사를 선택해 주세요
+                        </p>
                       </div>
-                      <p
-                        className={clsx(
-                          "body_2",
-                          fieldState.invalid
-                            ? "text-error-500"
-                            : "text-gray-400"
-                        )}
-                      >
-                        링크를 입력하고 이력서와 적성검사를 선택해 주세요
-                      </p>
+                    )}
+                  />
+                  <Button
+                    variant={"default_primary"}
+                    size={"large"}
+                    className="w-full"
+                  >
+                    <div className="flex items-center">
+                      <p>채용공고와 비교하기</p>
+                      <SvgColor
+                        src="/icons/icon-search.svg"
+                        width={32}
+                        height={32}
+                      />
                     </div>
-                  )}
-                />
-                <Button
-                  variant={"default_primary"}
-                  size={"large"}
-                  className="w-full"
-                >
-                  <div className="flex items-center">
-                    <p>채용공고와 비교하기</p>
-                    <SvgColor
-                      src="/icons/icon-search.svg"
-                      width={32}
-                      height={32}
-                    />
-                  </div>
-                </Button>
+                  </Button>
+                </div>
               </div>
             </div>
           </section>
 
           {/* 이력서, 적성검사 섹션 */}
-
           <div className="flex gap-8 mb-[72px]">
             {/* 이력서 목록 */}
             <SelectForm
