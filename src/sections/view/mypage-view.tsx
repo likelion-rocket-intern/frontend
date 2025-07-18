@@ -1,20 +1,17 @@
 "use client";
 
 import { z as zod } from "zod";
-import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import clsx from "clsx";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Span } from "next/dist/trace";
 import SelectForm from "@/components/SelectForm";
+import { Input } from "@/components/ui/input";
+import { SvgColor } from "@/components/svg-color";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
 const MypageSchema = zod.object({
+  link: zod.string(),
   resume: zod.number(),
   aptitude: zod.number(),
 });
@@ -24,10 +21,9 @@ export default function MypageView() {
     resolver: zodResolver(MypageSchema),
   });
   const {
-    reset,
     watch,
-    handleSubmit,
-    formState: { isSubmitting, errors },
+    control,
+    formState: { errors },
   } = methods;
   const values = watch();
 
@@ -37,7 +33,8 @@ export default function MypageView() {
   };
 
   return (
-    <>
+    <div className="space-y-20">
+      {/* 프로필 섹션 */}
       <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
         <div className="size-[112px] bg-white rounded-full"></div>
         <section className="flex flex-col gap-2 w-[318px]">
@@ -65,8 +62,51 @@ export default function MypageView() {
         </section>
       </div>
 
-      {/* 이력서, 적성검사 섹션 */}
+      {/* 종합결과 섹션 */}
+      <section className="space-y-[54px]">
+        <h2 className="title_1 text-[#767676]">종합결과</h2>
+        <div className="flex flex-col items-center justify-center bg-[url('/images/match_keywords.png')] h-[588px] bg-contain bg-no-repeat bg-center">
+          <div className="w-[384px]">
+            <h2 className="title_2 text-gray-600 mb-8 text-center">
+              기업과 나의 핵심 키워드 찾기
+            </h2>
+            <Controller
+              name="link"
+              control={control}
+              render={({ field }) => (
+                <div className="ring ring-primary-400 bg-white px-4 py-2 rounded-[10px] flex items-center mb-2">
+                  <SvgColor
+                    src="/icons/icon-link.svg"
+                    width={24}
+                    height={24}
+                    className="text-gray-400"
+                  />
+                  <Input
+                    value={field.value}
+                    className="focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2 placeholder:text-gray-400"
+                    placeholder="채용공고 링크 입력"
+                  />
+                </div>
+              )}
+            />
+            <p className="body_2 text-gray-400 mb-8">
+              링크를 입력하고 이력서와 적성검사를 선택해 주세요
+            </p>
+            <Button
+              variant={"default_primary"}
+              size={"large"}
+              className="w-full"
+            >
+              <div className="flex items-center">
+                <p>채용공고와 비교하기</p>
+                <SvgColor src="/icons/icon-search.svg" width={32} height={32} />
+              </div>
+            </Button>
+          </div>
+        </div>
+      </section>
 
+      {/* 이력서, 적성검사 섹션 */}
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <div className="flex gap-8 mb-[72px]">
@@ -88,32 +128,8 @@ export default function MypageView() {
               methods={methods}
             />
           </div>
-
-          <section className="space-y-6">
-            {/* 헤더 */}
-            <header className="flex justify-between items-center">
-              <div>
-                <h2 className="title_1 text-[#767676] mb-2">종합결과</h2>
-              </div>
-              <Button type="submit" variant={"default_primary"}>
-                종합결과보기
-              </Button>
-            </header>
-
-            {/* 결과 박스 */}
-            <article className="bg-[#F8F8F8] flex justify-center items-center w-full h-[175px] rounded-2xl">
-              <p
-                className={clsx(
-                  "text-[#A3A3A3] body_2",
-                  (errors.resume || errors.aptitude) && "text-error-500"
-                )}
-              >
-                이력서와 적성검사 목록에서 항목을 하나씩 선택해 주세요
-              </p>
-            </article>
-          </section>
         </form>
       </FormProvider>
-    </>
+    </div>
   );
 }
