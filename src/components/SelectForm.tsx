@@ -26,7 +26,7 @@ export default function SelectForm({
   return (
     <section className="relative flex-1 flex flex-col gap-4">
       <div className="flex justify-between border-b-2 border-[#D9D9D9] pb-4 px-2">
-        <h2 className="title_1 text-[#777777]">{title}</h2>
+        <h2 className="subtitle_1 text-[#777777]">{title}</h2>
         {values[name] !== undefined && (
           <span className="body_2 text-gray-500">선택 완료</span>
         )}

@@ -7,11 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SelectForm from "@/components/SelectForm";
 import { Input } from "@/components/ui/input";
 import { SvgColor } from "@/components/svg-color";
+import clsx from "clsx";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
 const MypageSchema = zod.object({
-  link: zod.string(),
+  link: zod.string().min(1),
   resume: zod.number(),
   aptitude: zod.number(),
 });
@@ -19,15 +20,13 @@ const MypageSchema = zod.object({
 export default function MypageView() {
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
+    defaultValues: {
+      link: "",
+    },
   });
-  const {
-    watch,
-    control,
-    formState: { errors },
-  } = methods;
+  const { watch, control } = methods;
   const values = watch();
 
-  console.log(errors);
   const onSubmit = (formData: MypageSchemaType) => {
     console.log(formData);
   };
@@ -62,53 +61,79 @@ export default function MypageView() {
         </section>
       </div>
 
-      {/* 종합결과 섹션 */}
-      <section className="space-y-[54px]">
-        <h2 className="title_1 text-[#767676]">종합결과</h2>
-        <div className="flex flex-col items-center justify-center bg-[url('/images/match_keywords.png')] h-[588px] bg-contain bg-no-repeat bg-center">
-          <div className="w-[384px]">
-            <h2 className="title_2 text-gray-600 mb-8 text-center">
-              기업과 나의 핵심 키워드 찾기
-            </h2>
-            <Controller
-              name="link"
-              control={control}
-              render={({ field }) => (
-                <div className="ring ring-primary-400 bg-white px-4 py-2 rounded-[10px] flex items-center mb-2">
-                  <SvgColor
-                    src="/icons/icon-link.svg"
-                    width={24}
-                    height={24}
-                    className="text-gray-400"
-                  />
-                  <Input
-                    value={field.value}
-                    className="focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2 placeholder:text-gray-400"
-                    placeholder="채용공고 링크 입력"
-                  />
-                </div>
-              )}
-            />
-            <p className="body_2 text-gray-400 mb-8">
-              링크를 입력하고 이력서와 적성검사를 선택해 주세요
-            </p>
-            <Button
-              variant={"default_primary"}
-              size={"large"}
-              className="w-full"
-            >
-              <div className="flex items-center">
-                <p>채용공고와 비교하기</p>
-                <SvgColor src="/icons/icon-search.svg" width={32} height={32} />
-              </div>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* 이력서, 적성검사 섹션 */}
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
+          {/* 종합결과 섹션 */}
+          <section className="space-y-[54px] mb-20">
+            <h2 className="title_1 text-[#767676]">종합결과</h2>
+            <div className="flex flex-col items-center justify-center bg-[url('/images/match_keywords.png')] h-[588px] bg-contain bg-no-repeat bg-center">
+              <div className="w-[384px]">
+                <h2 className="title_2 text-gray-600 mb-8 text-center">
+                  기업과 나의 핵심 키워드 찾기
+                </h2>
+                <Controller
+                  name="link"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <div className="mb-8">
+                      <div
+                        className={clsx(
+                          "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
+                          fieldState.invalid
+                            ? "ring-error-500"
+                            : "ring-primary-400"
+                        )}
+                      >
+                        <SvgColor
+                          src="/icons/icon-link.svg"
+                          width={24}
+                          height={24}
+                          className="text-gray-400"
+                        />
+                        <Input
+                          {...field}
+                          className={clsx(
+                            "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
+                            fieldState.invalid
+                              ? "placeholder:text-error-500"
+                              : "placeholder:text-gray-400"
+                          )}
+                          placeholder="채용공고 링크 입력"
+                        />
+                      </div>
+                      <p
+                        className={clsx(
+                          "body_2",
+                          fieldState.invalid
+                            ? "text-error-500"
+                            : "text-gray-400"
+                        )}
+                      >
+                        링크를 입력하고 이력서와 적성검사를 선택해 주세요
+                      </p>
+                    </div>
+                  )}
+                />
+                <Button
+                  variant={"default_primary"}
+                  size={"large"}
+                  className="w-full"
+                >
+                  <div className="flex items-center">
+                    <p>채용공고와 비교하기</p>
+                    <SvgColor
+                      src="/icons/icon-search.svg"
+                      width={32}
+                      height={32}
+                    />
+                  </div>
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* 이력서, 적성검사 섹션 */}
+
           <div className="flex gap-8 mb-[72px]">
             {/* 이력서 목록 */}
             <SelectForm
