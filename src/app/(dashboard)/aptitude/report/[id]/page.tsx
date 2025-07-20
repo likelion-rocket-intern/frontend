@@ -10,6 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from 'next/image';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import mockData from './mock';
 
 interface PageProps {
   params: Promise<{
@@ -21,61 +24,6 @@ interface TestResult {
   id: number;
   user_id: number;
   version: string;
-  test: {
-    SUCC_YN: string;
-    ERROR_REASON: string;
-    RESULT: Array<{
-      question: string;
-      answer01: string;
-      answer02: string;
-      answer03: string;
-      answer04: string;
-      answerScore01: string;
-      answerScore02: string;
-      qitemNo: number;
-    }>;
-  };
-  test_result: {
-    inspctseq: string;
-    qestnrseq: string;
-    target: string;
-    targetcd: string;
-    comptdtm: string;
-    code1: string;
-    code1nm: string;
-    w1: number;
-    code2: string;
-    code2nm: string;
-    w2: number;
-    code3: string;
-    code3nm: string;
-    w3: number;
-    code4: string;
-    code4nm: string;
-    w4: number;
-    code5: string;
-    code5nm: string;
-    w5: number;
-    code6: string;
-    code6nm: string;
-    w6: number;
-    code7: string;
-    code7nm: string;
-    w7: number;
-    code8: string;
-    code8nm: string;
-    w8: number;
-    report6_data: {
-      realms: Array<{
-        code: string;
-        name: string;
-        dc: string;
-        choice: string;
-        life: string;
-        class: string;
-      }>;
-    };
-  };
   created_at: string;
   jinro_results: Array<{
     id: number;
@@ -145,6 +93,8 @@ interface DevRole {
   name: string;
   rank: number;
   similarity: number;
+  description: string | null;
+  job_type: string;
   characteristics: {
     category: string;
     value: number;
@@ -152,10 +102,26 @@ interface DevRole {
 }
 
 const ROLE_COLORS = {
-  1: "#ff6b00", // 주황색
-  2: "#22c55e", // 초록색
-  3: "#eab308", // 노란색
+  1: {
+    stroke: "#ff6b00",
+    fill: "#ff6b00",
+  },
+  2: {
+    stroke: "#22c55e",
+    fill: "#22c55e",
+  },
+  3: {
+    stroke: "#eab308",
+    fill: "#eab308",
+  }
 } as const;
+
+const JOB_IMAGES: { [key: string]: string } = {
+  'marketer': '/images/job-icons/marketer.png',
+  'app_developer': '/images/job-icons/app-developer.png',
+  'embedded_developer': '/images/job-icons/embedded-developer.png',
+  // 다른 직군 이미지들도 추가
+};
 
 export default function AptitudeReportPage({ params }: PageProps) {
   const { id } = use(params);
@@ -163,6 +129,7 @@ export default function AptitudeReportPage({ params }: PageProps) {
   const [devRoles, setDevRoles] = useState<DevRole[]>([]);
   const [selectedRole, setSelectedRole] = useState<DevRole | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedRole, setExpandedRole] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchReport() {
@@ -191,6 +158,8 @@ export default function AptitudeReportPage({ params }: PageProps) {
           name: result.first_job.job_name_ko,
           rank: 1,
           similarity: result.first_job_score,
+          description: result.first_job.description,
+          job_type: result.first_job.job_type,
           characteristics: [
             { category: "능력발휘", value: result.first_job.ability_development },
             { category: "자율성", value: result.first_job.autonomy },
@@ -206,6 +175,8 @@ export default function AptitudeReportPage({ params }: PageProps) {
           name: result.second_job.job_name_ko,
           rank: 2,
           similarity: result.second_job_score,
+          description: result.second_job.description,
+          job_type: result.second_job.job_type,
           characteristics: [
             { category: "능력발휘", value: result.second_job.ability_development },
             { category: "자율성", value: result.second_job.autonomy },
@@ -221,6 +192,8 @@ export default function AptitudeReportPage({ params }: PageProps) {
           name: result.third_job.job_name_ko,
           rank: 3,
           similarity: result.third_job_score,
+          description: result.third_job.description,
+          job_type: result.third_job.job_type,
           characteristics: [
             { category: "능력발휘", value: result.third_job.ability_development },
             { category: "자율성", value: result.third_job.autonomy },
@@ -235,7 +208,12 @@ export default function AptitudeReportPage({ params }: PageProps) {
       ];
 
       setDevRoles(roles);
-      setSelectedRole(roles[0]); // 기본값으로 1순위 선택
+      // 기본값으로 첫 번째 직군 선택
+      useEffect(() => {
+        if (devRoles.length > 0 && !selectedRole) {
+          setSelectedRole(devRoles[0]);
+        }
+      }, [devRoles]);
     }
   }, [report]);
 
@@ -268,94 +246,194 @@ export default function AptitudeReportPage({ params }: PageProps) {
   }));
 
   return (
-    <div className="container mx-auto py-8 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-8 text-center">직업 가치관 검사 결과</h1>
+    <div className="container mx-auto py-8 space-y-8">
+      {/* 추천직군 섹션 */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6">추천직군</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 1위 직무 이미지 */}
+          <div className="bg-gray-600 rounded-lg p-6 text-center">
+            <h3 className="text-white text-xl mb-4">
+              {selectedRole ? `${selectedRole.rank}위 직무` : '1위 직무'}
+            </h3>
+            <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4">
+              <Image
+                src={selectedRole ? JOB_IMAGES[selectedRole.job_type] || '/images/job-icons/default.png' : '/images/job-icons/default.png'}
+                alt={`${selectedRole?.name || '직무'} 아이콘`}
+                width={160}
+                height={160}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
 
-      <div className="space-y-8">
-        {/* 가치관 레이더 차트 섹션 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 왼쪽: 레이더 차트 */}
-          <Card>
-            <CardContent className="">
-              <div className="w-full aspect-square max-h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={chartData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="category" />
-                    <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={false} />
-                    <Radar
-                      name="내 가치관 점수"
-                      dataKey="user"
-                      stroke="#2563eb"
-                      fill="transparent"
-                      strokeWidth={2}
-                    />
-                    <Radar
-                      name={selectedRole?.name}
-                      dataKey="role"
-                      stroke={selectedRole ? ROLE_COLORS[selectedRole.rank as keyof typeof ROLE_COLORS] : "#2563eb"}
-                      fill="transparent"
-                      strokeWidth={2}
-                    />
-                    <Tooltip
-                      formatter={(value: number) => value.toFixed(1) + '점'}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 오른쪽: 개발자 직군 순위 */}
-          <Card className="p-3">
-            <CardHeader className="p-2">
-              <CardTitle className="text-lg font-bold">추천 개발자 직군</CardTitle>
-              <CardDescription>가치관 유사도 기반 추천 순위입니다</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2 p-2">
-              {devRoles.map((role) => (
-                <div
-                  key={role.name}
-                  className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-all hover:bg-slate-50 ${selectedRole?.name === role.name ? 'bg-blue-50 ring-1 ring-blue-500' : ''
-                    }`}
-                  onClick={() => setSelectedRole(role)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium" style={{ color: ROLE_COLORS[role.rank as keyof typeof ROLE_COLORS] }}>{role.rank}.</span>
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium">{role.name}</span>
-                        {role.rank === 1 && <span className="text-yellow-500">★</span>}
-                      </div>
-                      <span className="text-sm text-gray-500">유사도 {role.similarity.toFixed(1)}%</span>
+          {/* 추천 직군 리스트 */}
+          <div className="bg-white rounded-lg shadow-sm min-h-[380px]">
+            <div className="p-4">
+              <h3 className="text-xl font-medium mb-2">추천직군</h3>
+              <p className="text-gray-500 text-sm">가치관 유사도 기반 추천 순위입니다.</p>
+            </div>
+            <div className="divide-y">
+              {devRoles.map((role, index) => (
+                <div key={role.name}>
+                  <div
+                    className={`flex items-center justify-between px-6 py-3 hover:bg-gray-50 cursor-pointer ${selectedRole?.name === role.name ? 'bg-gray-50' : ''
+                      }`}
+                    onClick={() => {
+                      setSelectedRole(role);
+                      setExpandedRole(expandedRole === index ? null : index);
+                    }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className={`text-xl ${index === 0 ? 'text-[#ff6b00]' :
+                        index === 1 ? 'text-[#22c55e]' :
+                          'text-[#eab308]'
+                        }`}>
+                        {index + 1}
+                      </span>
+                      <span className="text-gray-900">{role.name}</span>
                     </div>
+                    {expandedRole === index ? (
+                      <ChevronUp className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    )}
                   </div>
-                  {selectedRole?.name === role.name && (
-                    <span className="text-xs text-blue-500">차트에 표시 중</span>
-                  )}
+                  <div
+                    className={`px-6 bg-gray-50 transition-all duration-300 ease-in-out ${expandedRole === index ? 'py-3 h-[90px]' : 'h-0'
+                      } overflow-hidden`}
+                  >
+                    <h4 className="text-sm text-gray-500 mb-1">직무설명</h4>
+                    <p className="text-gray-700 text-sm line-clamp-3">{role.description}</p>
+                  </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 적성검사 결과 섹션 */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6">적성검사 결과</h2>
+        <div className="bg-white rounded-lg p-6">
+          <div className="w-full h-[400px]"> {/* 높이 고정값으로 변경 */}
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={chartData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="category" />
+                <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={false} />
+                <Radar
+                  name="검사결과"
+                  dataKey="user"
+                  stroke="#4A72FF"
+                  fill="#4A72FF"
+                  fillOpacity={0.3}
+                />
+                <Radar
+                  name={selectedRole?.name || "직군평균"}
+                  dataKey="role"
+                  stroke={selectedRole ? ROLE_COLORS[selectedRole.rank as keyof typeof ROLE_COLORS].stroke : "#FF8F5C"}
+                  fill={selectedRole ? ROLE_COLORS[selectedRole.rank as keyof typeof ROLE_COLORS].fill : "#FF8F5C"}
+                  fillOpacity={0.3}
+                />
+                <Tooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex justify-center gap-8 mt-4 h-[40px] items-center">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#4A72FF]" />
+              <span>본인결과</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{
+                  backgroundColor: selectedRole
+                    ? ROLE_COLORS[selectedRole.rank as keyof typeof ROLE_COLORS].fill
+                    : "#FF8F5C"
+                }}
+              />
+              <span>{selectedRole?.name || "직군평균"}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 가치관 설명 섹션 */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6">가치관 설명</h2>
+        {/* 요약 박스 */}
+        <div className="bg-gray-50 rounded-lg p-8 mb-6">
+          <p className="text-center text-lg">
+            직업생활과 관련하여
+            <span className="text-[#ff6b00] font-medium">{sortedValues[0].name}</span>
+            (와)과
+            <span className="text-[#ff6b00] font-medium">{sortedValues[1].name}</span>
+            (을)를 가장 중요하게 생각합니다.
+            <br />
+            반면에
+            <span className="text-[#4A72FF] font-medium">{sortedValues[6].name}</span>
+            ,
+            <span className="text-[#4A72FF] font-medium">{sortedValues[7].name}</span>
+            은 상대적으로 덜 중요하게 생각합니다.
+          </p>
         </div>
 
-        {/* 가치관 설명 */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4">가치관 설명</h2>
-          <div className="space-y-4">
-            {report.test_result.report6_data.realms.map((realm) => (
-              <div key={realm.code} className="bg-white p-4 rounded-lg shadow">
-                <h3 className="font-bold mb-2">{realm.name}</h3>
-                <div className="space-y-2 text-gray-600">
-                  <p>{realm.dc}</p>
-                  <p>{realm.choice}</p>
-                  <p>{realm.life}</p>
+        {/* 가치관 카드 리스트 */}
+        <div className="space-y-4">
+          {sortedValues.map((value, index) => {
+            const realmData = mockData.realms.find(realm => realm.name === value.name);
+            if (!realmData) return null;
+
+            return (
+              <div
+                key={value.code}
+                className={`border rounded-lg ${index < 2
+                  ? 'border-[#FFA172]' // 상위 2개는 오렌지색
+                  : index >= sortedValues.length - 2
+                    ? 'border-[#4A72FF]' // 하위 2개는 파란색
+                    : 'border-gray-200' // 나머지는 기본 회색
+                  }`}
+              >
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="text-xl font-medium">{index + 1}</span>
+                    <span className="text-xl">{value.name}</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex">
+                      <div className="bg-gray-50 w-[100px] p-3 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-600">특징</span>
+                      </div>
+                      <div className="flex-1 p-3">
+                        <span>{realmData.dc}</span>
+                      </div>
+                    </div>
+                    <div className="flex">
+                      <div className="bg-gray-50 w-[100px] p-3 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-600">직업선택</span>
+                      </div>
+                      <div className="flex-1 p-3">
+                        <span>{realmData.choice}</span>
+                      </div>
+                    </div>
+                    <div className="flex">
+                      <div className="bg-gray-50 w-[100px] p-3 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-600">직업생활</span>
+                      </div>
+                      <div className="flex-1 p-3">
+                        <span>{realmData.life}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 } 
