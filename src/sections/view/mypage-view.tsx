@@ -1,20 +1,18 @@
 "use client";
 
 import { z as zod } from "zod";
-import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import clsx from "clsx";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Span } from "next/dist/trace";
 import SelectForm from "@/components/SelectForm";
+import { Input } from "@/components/ui/input";
+import { SvgColor } from "@/components/svg-color";
+import clsx from "clsx";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
 const MypageSchema = zod.object({
+  link: zod.string().min(1),
   resume: zod.number(),
   aptitude: zod.number(),
 });
@@ -22,22 +20,20 @@ const MypageSchema = zod.object({
 export default function MypageView() {
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
+    defaultValues: {
+      link: "",
+    },
   });
-  const {
-    reset,
-    watch,
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = methods;
+  const { watch, control } = methods;
   const values = watch();
 
-  console.log(errors);
   const onSubmit = (formData: MypageSchemaType) => {
     console.log(formData);
   };
 
   return (
-    <>
+    <div className="space-y-20">
+      {/* 프로필 섹션 */}
       <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
         <div className="size-[112px] bg-white rounded-full"></div>
         <section className="flex flex-col gap-2 w-[318px]">
@@ -65,10 +61,99 @@ export default function MypageView() {
         </section>
       </div>
 
-      {/* 이력서, 적성검사 섹션 */}
-
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
+          {/* 종합결과 섹션 */}
+          <section className="space-y-[54px] mb-20">
+            <h2 className="title_1 text-[#767676]">종합결과</h2>
+            <div className="relative flex justify-center items-center h-[588px]">
+              {/* 왼쪽 원 */}
+              <div className="absolute left-1/6 translate-x-[-50%] flex flex-col items-center">
+                <span className="text-gray-500 title_1 mb-4">
+                  기업이 원하는 역량
+                </span>
+                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
+                  keyword
+                </div>
+              </div>
+
+              {/* 오른쪽 원 */}
+              <div className="absolute right-1/6 translate-x-[50%] flex flex-col items-center">
+                <span className="text-gray-500 title_1 mb-4">나의 역량</span>
+                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
+                  keyword
+                </div>
+              </div>
+
+              {/* 가운데 큰 원 */}
+              <div className="relative size-[588px] rounded-full border border-orange-500 bg-orange-300/15 flex justify-center items-center">
+                <div className="w-[384px]">
+                  <h2 className="title_2 text-gray-600 mb-8 text-center">
+                    기업과 나의 핵심 키워드 찾기
+                  </h2>
+                  <Controller
+                    name="link"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div className="mb-8">
+                        <div
+                          className={clsx(
+                            "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
+                            fieldState.invalid
+                              ? "ring-error-500"
+                              : "ring-primary-400"
+                          )}
+                        >
+                          <SvgColor
+                            src="/icons/icon-link.svg"
+                            width={24}
+                            height={24}
+                            className="text-gray-400"
+                          />
+                          <Input
+                            {...field}
+                            className={clsx(
+                              "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
+                              fieldState.invalid
+                                ? "placeholder:text-error-500"
+                                : "placeholder:text-gray-400"
+                            )}
+                            placeholder="채용공고 링크 입력"
+                          />
+                        </div>
+                        <p
+                          className={clsx(
+                            "body_2",
+                            fieldState.invalid
+                              ? "text-error-500"
+                              : "text-gray-400"
+                          )}
+                        >
+                          링크를 입력하고 이력서와 적성검사를 선택해 주세요
+                        </p>
+                      </div>
+                    )}
+                  />
+                  <Button
+                    variant={"default_primary"}
+                    size={"large"}
+                    className="w-full"
+                  >
+                    <div className="flex items-center">
+                      <p>채용공고와 비교하기</p>
+                      <SvgColor
+                        src="/icons/icon-search.svg"
+                        width={32}
+                        height={32}
+                      />
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 이력서, 적성검사 섹션 */}
           <div className="flex gap-8 mb-[72px]">
             {/* 이력서 목록 */}
             <SelectForm
@@ -88,32 +173,8 @@ export default function MypageView() {
               methods={methods}
             />
           </div>
-
-          <section className="space-y-6">
-            {/* 헤더 */}
-            <header className="flex justify-between items-center">
-              <div>
-                <h2 className="title_1 text-[#767676] mb-2">종합결과</h2>
-              </div>
-              <Button type="submit" variant={"default_primary"}>
-                종합결과보기
-              </Button>
-            </header>
-
-            {/* 결과 박스 */}
-            <article className="bg-[#F8F8F8] flex justify-center items-center w-full h-[175px] rounded-2xl">
-              <p
-                className={clsx(
-                  "text-[#A3A3A3] body_2",
-                  (errors.resume || errors.aptitude) && "text-error-500"
-                )}
-              >
-                이력서와 적성검사 목록에서 항목을 하나씩 선택해 주세요
-              </p>
-            </article>
-          </section>
         </form>
       </FormProvider>
-    </>
+    </div>
   );
 }
