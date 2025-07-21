@@ -50,7 +50,12 @@ type ResumeDetailResponse = {
   file_path?: string;
   analysis_result: string | AnalysisResult;
   created_at: string;
-  keywords?: { keyword: string; frequency: number }[];
+  keywords?: {
+    keyword: string;
+    similar_to: string;
+    similarity: number;
+    frequency: number;
+  }[];
 };
 
 export default function ResumeReportView() {
@@ -292,6 +297,7 @@ export default function ResumeReportView() {
                 <span
                   key={i}
                   className="px-4 py-2 rounded-full bg-primary-100 text-gray-600 button"
+                // title={`유사 키워드: ${keyword.similar_to} (유사도: ${(keyword.similarity * 100).toFixed(1)}%)`}
                 >
                   {keyword.keyword} ({keyword.frequency})
                 </span>
