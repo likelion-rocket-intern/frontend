@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Image from 'next/image';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import mockData from './mock';
 
@@ -116,12 +115,13 @@ const ROLE_COLORS = {
   }
 } as const;
 
-const JOB_IMAGES: { [key: string]: string } = {
+// TODO: 이미지 추가 예정
+/*const JOB_IMAGES: { [key: string]: string } = {
   'marketer': '/images/job-icons/marketer.png',
   'app_developer': '/images/job-icons/app-developer.png',
   'embedded_developer': '/images/job-icons/embedded-developer.png',
   // 다른 직군 이미지들도 추가
-};
+};*/
 
 export default function AptitudeReportPage({ params }: PageProps) {
   const { id } = use(params);
@@ -208,14 +208,15 @@ export default function AptitudeReportPage({ params }: PageProps) {
       ];
 
       setDevRoles(roles);
-      // 기본값으로 첫 번째 직군 선택
-      useEffect(() => {
-        if (devRoles.length > 0 && !selectedRole) {
-          setSelectedRole(devRoles[0]);
-        }
-      }, [devRoles]);
     }
   }, [report]);
+
+  // 기본값으로 첫 번째 직군 선택
+  useEffect(() => {
+    if (devRoles.length > 0 && !selectedRole) {
+      setSelectedRole(devRoles[0]);
+    }
+  }, [devRoles, selectedRole]);
 
   if (error) {
     return <div className="text-red-500 p-4">{error}</div>;
@@ -257,13 +258,15 @@ export default function AptitudeReportPage({ params }: PageProps) {
               {selectedRole ? `${selectedRole.rank}위 직무` : '1위 직무'}
             </h3>
             <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4">
-              {/* <Image
+              {/* TODO: 이미지 추가 예정
+              <Image
                 src={selectedRole ? JOB_IMAGES[selectedRole.job_type] || '/images/job-icons/default.png' : '/images/job-icons/default.png'}
                 alt={`${selectedRole?.name || '직무'} 아이콘`}
                 width={160}
                 height={160}
                 className="w-full h-full object-contain"
-              /> */}
+              />
+              */}
             </div>
           </div>
 
