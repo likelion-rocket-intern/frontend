@@ -257,13 +257,13 @@ export default function AptitudeReportPage({ params }: PageProps) {
               {selectedRole ? `${selectedRole.rank}위 직무` : '1위 직무'}
             </h3>
             <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4">
-              <Image
+              {/* <Image
                 src={selectedRole ? JOB_IMAGES[selectedRole.job_type] || '/images/job-icons/default.png' : '/images/job-icons/default.png'}
                 alt={`${selectedRole?.name || '직무'} 아이콘`}
                 width={160}
                 height={160}
                 className="w-full h-full object-contain"
-              />
+              /> */}
             </div>
           </div>
 
