@@ -50,15 +50,13 @@ type ResumeDetailResponse = {
   file_path?: string;
   analysis_result: string | AnalysisResult;
   created_at: string;
+  keywords?: {
+    keyword: string;
+    similar_to: string;
+    similarity: number;
+    frequency: number;
+  }[];
 };
-
-const keywords = [
-  "이력서 키워드",
-  "이력서 키워드",
-  "이력서 키워드",
-  "이력서 키워드",
-  "이력서 키워드",
-];
 
 export default function ResumeReportView() {
   const params = useParams();
@@ -85,7 +83,7 @@ export default function ResumeReportView() {
     queryKey: ["api", "v1", "resume", resume_id],
     queryFn: async () => {
       try {
-        setTimeout(() => {}, 1000);
+        setTimeout(() => { }, 1000);
         const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
           params: {
             path: {
@@ -295,12 +293,13 @@ export default function ResumeReportView() {
 
             {/* 키워드 리스트 */}
             <div className="flex flex-wrap justify-center gap-3">
-              {keywords.map((keyword, i) => (
+              {resumeDetail?.keywords?.map((keyword, i) => (
                 <span
                   key={i}
                   className="px-4 py-2 rounded-full bg-primary-100 text-gray-600 button"
+                // title={`유사 키워드: ${keyword.similar_to} (유사도: ${(keyword.similarity * 100).toFixed(1)}%)`}
                 >
-                  {keyword}
+                  {keyword.keyword} ({keyword.frequency})
                 </span>
               ))}
             </div>
@@ -333,21 +332,7 @@ export default function ResumeReportView() {
         </div>
       </section>
 
-      {/* 개선 제안 */}
-      <section className="space-y-8">
-        <h2 className="title_2 text-gray-500">개선제안</h2>
-        <div className="grid grid-cols-2 gap-6">
-          {MOCK_RESUME_RESULT.resume_suggestion.map((item, i) => (
-            <article
-              key={i}
-              className="bg-white rounded-lg shadow-shadow-2 px-4 pt-6 pb-20 space-y-4"
-            >
-              <h4 className="subtitle_1 text-gray-700">{item.title}</h4>
-              <p className="text-gray-500 body_1">{item.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      {/* 개선 제안 섹션 제거 - API에서 제공하지 않는 데이터 */}
     </div>
   );
 }

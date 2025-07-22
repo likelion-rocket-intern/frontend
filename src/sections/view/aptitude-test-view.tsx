@@ -32,6 +32,12 @@ interface TestReportRequest {
   answers: string;
 }
 
+interface TestReportResponse {
+  success: boolean;
+  result_id: number;
+  message: string;
+}
+
 export default function AptitudeTestView() {
   const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -96,22 +102,14 @@ export default function AptitudeTestView() {
       //   body: requestBody
       // });
 
-      const { data, error } = await client.POST(
-        "/api/v1/jinro/test-report-v1",
-        {
-          body: requestBody,
-        }
-      );
+      const { data, error } = await client.POST('/api/v1/jinro/test-report-v1', {
+        body: requestBody
+      }) as { data: TestReportResponse | undefined, error: any };
 
-      if (error) {
-        setError("검사 결과 제출에 실패했습니다");
-        return;
-      }
-
-      if (data?.result_id) {
+      if (data?.success && data.result_id) {
         router.push(`/aptitude/report/${data.result_id}`);
       } else {
-        setError("결과 ID를 받지 못했습니다");
+        setError(data?.message || "결과 ID를 받지 못했습니다");
       }
     } catch (err) {
       setError("검사 결과 제출 중 오류가 발생했습니다");
