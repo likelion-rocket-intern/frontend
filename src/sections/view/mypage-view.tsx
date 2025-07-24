@@ -8,6 +8,8 @@ import SelectForm from "@/components/SelectForm";
 import { Input } from "@/components/ui/input";
 import { SvgColor } from "@/components/svg-color";
 import clsx from "clsx";
+import { useQuery } from "@tanstack/react-query";
+import client from "@/app/lib/client";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
@@ -18,6 +20,18 @@ const MypageSchema = zod.object({
 });
 
 export default function MypageView() {
+  const { data: userData } = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const res = await client.GET("/api/v1/auth/me");
+      if (res.error) {
+        throw new Error("Failed to fetch user data");
+      }
+      return res.data;
+    },
+  });
+  console.log(userData);
+
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
     defaultValues: {
@@ -37,8 +51,10 @@ export default function MypageView() {
       <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
         <div className="size-[112px] bg-white rounded-full"></div>
         <section className="flex flex-col gap-2 w-[318px]">
-          <span className="title_1">이능력</span>
-          <span className="body_2">dlsmdfur34@naver.com</span>
+          <span className="title_1">{userData?.nickname}</span>
+          <span className="body_2">
+            {userData?.email ? userData?.email : "등록된 이메일이 없습니다."}
+          </span>
           <div className="flex items-center text-gray-400">
             <Button variant={"link_default"} className="px-4 py-2 caption_1">
               로그아웃
