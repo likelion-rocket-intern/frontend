@@ -3,7 +3,7 @@ import type { paths } from "./schema";
 import { ResumeUploadSchemaType } from "@/sections/view/resume-upload-view";
 import type { components } from "./schema";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://192.168.56.109:8000";
 
 const client = createClient<paths>({
   baseUrl,

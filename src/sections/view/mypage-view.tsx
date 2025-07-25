@@ -8,6 +8,12 @@ import SelectForm from "@/components/SelectForm";
 import { Input } from "@/components/ui/input";
 import { SvgColor } from "@/components/svg-color";
 import clsx from "clsx";
+import { useQuery } from "@tanstack/react-query";
+import client from "@/app/lib/client";
+import { useState } from "react";
+import AnalysisCircles from "@/components/AnalysisCircles";
+import KeywordCloud from "@/components/KeywordCloud";
+import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
@@ -17,28 +23,184 @@ const MypageSchema = zod.object({
   aptitude: zod.number(),
 });
 
+// 분석 전에 보여줄 간단한 하드코딩 키워드
+const preAnalysisKeywords: string[] = [
+  "리더십",
+  "문제해결",
+  "React",
+  "Java",
+  "Figma",
+  "소통",
+  "기획",
+];
+
 export default function MypageView() {
+  const [isAnalyzed, setIsAnalyzed] = useState(false);
+  const { data: userData } = useQuery({
+    queryKey: ["api", "v1", "auth", "me"],
+    queryFn: async () => {
+      const res = await client.GET("/api/v1/auth/me");
+      if (res.error) {
+        throw new Error("Failed to fetch user data");
+      }
+      return res.data;
+    },
+  });
+
+  const { data: resumeData } = useQuery({
+    queryKey: ["api", "v1", "resume"],
+    queryFn: async () => {
+      const res = await client.GET("/api/v1/resume/");
+      if (res.error) {
+        throw new Error("Failed to fetch resumes");
+      }
+      return res.data;
+    },
+  });
+
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
     defaultValues: {
       link: "",
     },
   });
-  const { watch, control } = methods;
+  const { watch, control, reset } = methods;
   const values = watch();
 
   const onSubmit = (formData: MypageSchemaType) => {
     console.log(formData);
+    setIsAnalyzed(true);
+  };
+
+  const handleReset = () => {
+    setIsAnalyzed(false);
+    reset();
+  };
+
+  const renderCenterCircleContent = () => {
+    if (isAnalyzed) {
+      return (
+        <article className="w-96 flex flex-col justify-center items-center gap-6">
+          <section className="flex items-center gap-6">
+            <div className="flex items-center gap-[5px]">
+              <p className="text-gray-800 title_1">88</p>
+              <p className="text-gray-600 title_3">/100점</p>
+            </div>
+            <p className="text-gray-800 title_2">우수</p>
+          </section>
+
+          <section className="flex flex-col justify-start items-center gap-4">
+            <h3 className="text-center text-gray-500 title_3">
+              기업과 나의 핵심 키워드
+            </h3>
+            <ul className="flex justify-center items-center gap-5">
+              <li className="text-center text-gray-700 title_3">키워드</li>
+              <li className="text-center text-gray-700 title_3">키워드</li>
+              <li className="text-center text-gray-700 title_3">키워드</li>
+            </ul>
+          </section>
+
+          <div className="w-full flex flex-col justify-start items-start gap-8">
+            <section>
+              <div className="flex items-start gap-6">
+                <h4 className="px-2 py-1 bg-white rounded-[10px] outline-1 outline-offset-[-1px] outline-primary-500 flex justify-center items-center w-24 text-center text-primary-500 button_2">
+                  장점
+                </h4>
+                <ul className="max-w-64 py-1.5 flex items-center gap-4 flex-wrap">
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                </ul>
+              </div>
+            </section>
+            <section>
+              <div className="flex items-start gap-6">
+                <h4 className="px-2 py-1 bg-white rounded-[10px] outline-1 outline-offset-[-1px] outline-gray-600 flex justify-center items-center w-24 text-center text-gray-500 button_2">
+                  단점
+                </h4>
+                <ul className="max-w-64 py-1.5 flex items-center gap-4 flex-wrap">
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                  <li className="text-center text-gray-700 button">키워드</li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </article>
+      );
+    }
+
+    return (
+      <div className="w-[384px]">
+        <h2 className="title_2 text-gray-600 mb-8 text-center">
+          기업과 나의 핵심 키워드 찾기
+        </h2>
+        <Controller
+          name="link"
+          control={control}
+          render={({ field, fieldState }) => (
+            <div className="mb-8">
+              <div
+                className={clsx(
+                  "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
+                  fieldState.invalid ? "ring-error-500" : "ring-primary-400"
+                )}
+              >
+                <SvgColor
+                  src="/icons/icon-link.svg"
+                  width={24}
+                  height={24}
+                  className="text-gray-400"
+                />
+                <Input
+                  {...field}
+                  className={clsx(
+                    "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
+                    fieldState.invalid
+                      ? "placeholder:text-error-500"
+                      : "placeholder:text-gray-400"
+                  )}
+                  placeholder="채용공고 링크 입력"
+                />
+              </div>
+              <p
+                className={clsx(
+                  "body_2",
+                  fieldState.invalid ? "text-error-500" : "text-gray-400"
+                )}
+              >
+                링크를 입력하고 이력서와 적성검사를 선택해 주세요
+              </p>
+            </div>
+          )}
+        />
+        <Button
+          variant={"default_primary"}
+          size={"large"}
+          className="w-full"
+          type="submit"
+        >
+          <div className="flex items-center">
+            <p>채용공고와 비교하기</p>
+            <SvgColor src="/icons/icon-search.svg" width={32} height={32} />
+          </div>
+        </Button>
+      </div>
+    );
   };
 
   return (
-    <div className="space-y-20">
+    <div>
       {/* 프로필 섹션 */}
       <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
         <div className="size-[112px] bg-white rounded-full"></div>
         <section className="flex flex-col gap-2 w-[318px]">
-          <span className="title_1">이능력</span>
-          <span className="body_2">dlsmdfur34@naver.com</span>
+          <span className="title_1">{userData?.nickname}</span>
+          <span className="body_2">
+            {userData?.email ? userData?.email : "등록된 이메일이 없습니다."}
+          </span>
           <div className="flex items-center text-gray-400">
             <Button variant={"link_default"} className="px-4 py-2 caption_1">
               로그아웃
@@ -52,129 +214,139 @@ export default function MypageView() {
         <div className="w-0.5 h-[106px] bg-gray-200"></div>
         <section className="w-[180px] flex flex-col gap-2 items-center">
           <span className="body_1">이력서</span>
-          <span className="subtitle_1">0건</span>
+          <span className="subtitle_1">
+            {resumeData?.resumes.length ?? 0}건
+          </span>
         </section>
         <div className="w-0.5 h-[106px] bg-gray-200"></div>
         <section className="w-[180px] flex flex-col gap-2 items-center">
           <span className="body_1">적성검사</span>
-          <span className="subtitle_1">0건</span>
+          <span className="subtitle_1">{0}건</span>
         </section>
       </div>
 
+      {/* 종합결과 섹션 */}
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
-          {/* 종합결과 섹션 */}
-          <section className="space-y-[54px] mb-20">
+          <section className="space-y-[54px] mb-8">
             <h2 className="title_1 text-[#767676]">종합결과</h2>
-            <div className="relative flex justify-center items-center h-[588px]">
-              {/* 왼쪽 원 */}
-              <div className="absolute left-1/6 translate-x-[-50%] flex flex-col items-center">
-                <span className="text-gray-500 title_1 mb-4">
-                  기업이 원하는 역량
-                </span>
-                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
-                  keyword
-                </div>
-              </div>
+            <AnalysisCircles
+              leftCircleContent={
+                <KeywordCloud
+                  keywords={
+                    isAnalyzed
+                      ? mockCompanyKeywords.slice(0, 7)
+                      : preAnalysisKeywords
+                  }
+                  isAnalyzed={isAnalyzed}
+                />
+              }
+              centerCircleContent={renderCenterCircleContent()}
+              rightCircleContent={
+                <KeywordCloud
+                  keywords={
+                    isAnalyzed
+                      ? mockMyKeywords.slice(0, 7)
+                      : preAnalysisKeywords
+                  }
+                  isAnalyzed={isAnalyzed}
+                />
+              }
+            />
 
-              {/* 오른쪽 원 */}
-              <div className="absolute right-1/6 translate-x-[50%] flex flex-col items-center">
-                <span className="text-gray-500 title_1 mb-4">나의 역량</span>
-                <div className="size-[380px] bg-gray-100 rounded-full shadow-md flex justify-center items-center">
-                  keyword
-                </div>
-              </div>
-
-              {/* 가운데 큰 원 */}
-              <div className="relative size-[588px] rounded-full border border-orange-500 bg-orange-300/15 flex justify-center items-center">
-                <div className="w-[384px]">
-                  <h2 className="title_2 text-gray-600 mb-8 text-center">
-                    기업과 나의 핵심 키워드 찾기
-                  </h2>
-                  <Controller
-                    name="link"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div className="mb-8">
-                        <div
-                          className={clsx(
-                            "ring bg-white px-4 py-2 rounded-[10px] flex items-center mb-2",
-                            fieldState.invalid
-                              ? "ring-error-500"
-                              : "ring-primary-400"
-                          )}
-                        >
-                          <SvgColor
-                            src="/icons/icon-link.svg"
-                            width={24}
-                            height={24}
-                            className="text-gray-400"
-                          />
-                          <Input
-                            {...field}
-                            className={clsx(
-                              "focus-visible:border-none focus-visible:ring-0 border-none body_2 placeholder:body_2",
-                              fieldState.invalid
-                                ? "placeholder:text-error-500"
-                                : "placeholder:text-gray-400"
-                            )}
-                            placeholder="채용공고 링크 입력"
-                          />
-                        </div>
-                        <p
-                          className={clsx(
-                            "body_2",
-                            fieldState.invalid
-                              ? "text-error-500"
-                              : "text-gray-400"
-                          )}
-                        >
-                          링크를 입력하고 이력서와 적성검사를 선택해 주세요
+            {isAnalyzed && (
+              <section className="w-full p-8 rounded-[20px] shadow-shadow-2 outline-1 outline-offset-[-1px] outline-gray-300 inline-flex flex-col justify-start items-start gap-6">
+                <header className="w-full h-20 flex flex-col justify-center items-center gap-1">
+                  <h2 className="text-center text-gray-600 title_2">직무명</h2>
+                  <p className="text-center text-gray-500 body_2">
+                    담당하는 업무설명
+                  </p>
+                </header>
+                <article className="flex flex-col justify-start items-start gap-6">
+                  <section className="inline-flex justify-start items-start gap-6">
+                    <h3 className="w-[232px] h-11 flex items-center text-gray-600 body_1 text-left">
+                      이런능력을 가지고 있어요
+                    </h3>
+                    <div className="flex-1 flex flex-col justify-start items-start gap-2">
+                      <div className="flex justify-start items-center gap-4">
+                        <strong className="px-4 py-2 bg-gray-25 rounded-[10px] flex justify-center items-center gap-2.5 w-20 text-center text-gray-500 ">
+                          키워드
+                        </strong>
+                        <p className="flex-1 text-gray-500 text-xl font-normal leading-loose">
+                          내용
                         </p>
                       </div>
-                    )}
-                  />
-                  <Button
-                    variant={"default_primary"}
-                    size={"large"}
-                    className="w-full"
-                  >
-                    <div className="flex items-center">
-                      <p>채용공고와 비교하기</p>
-                      <SvgColor
-                        src="/icons/icon-search.svg"
-                        width={32}
-                        height={32}
-                      />
+                      <div className="flex justify-start items-center gap-4">
+                        <strong className="px-4 py-2 bg-gray-25 rounded-[10px] flex justify-center items-center gap-2.5 w-20 text-center text-gray-500 ">
+                          키워드
+                        </strong>
+                        <p className="flex-1 text-gray-500 text-xl font-normal leading-loose">
+                          내용
+                        </p>
+                      </div>
                     </div>
-                  </Button>
-                </div>
-              </div>
-            </div>
+                  </section>
+                  <section className="inline-flex justify-start items-start gap-6">
+                    <h3 className="w-[232px] h-11 flex items-center text-gray-600 body_1 text-left">
+                      이런 능력이 필요해요
+                    </h3>
+                    <div className="flex-1 flex flex-col justify-start items-start gap-2">
+                      <div className="flex justify-start items-center gap-4">
+                        <strong className="px-4 py-2 bg-gray-25 rounded-[10px] flex justify-center items-center gap-2.5 w-20 text-center text-gray-500 ">
+                          키워드
+                        </strong>
+                        <p className="flex-1 text-gray-500 text-xl font-normal leading-loose">
+                          내용
+                        </p>
+                      </div>
+                      <div className="flex justify-start items-center gap-4">
+                        <strong className="px-4 py-2 bg-gray-25 rounded-[10px] flex justify-center items-center gap-2.5 w-20 text-center text-gray-500 ">
+                          키워드
+                        </strong>
+                        <p className="flex-1 text-gray-500 text-xl font-normal leading-loose">
+                          내용
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                </article>
+              </section>
+            )}
           </section>
 
-          {/* 이력서, 적성검사 섹션 */}
-          <div className="flex gap-8 mb-[72px]">
-            {/* 이력서 목록 */}
-            <SelectForm
-              title="이력서 목록"
-              itemTitle="000 이력서입니다."
-              name="resume"
-              values={values}
-              methods={methods}
-            />
-
-            {/* 적성검사 목록 */}
-            <SelectForm
-              title="적성검사 목록"
-              itemTitle="적성검사"
-              name="aptitude"
-              values={values}
-              methods={methods}
-            />
-          </div>
+          {!isAnalyzed && (
+            <div className="flex gap-8 mb-[72px]">
+              <SelectForm
+                title="이력서 목록"
+                itemTitle="000 이력서입니다."
+                name="resume"
+                values={values}
+                methods={methods}
+              />
+              <SelectForm
+                title="적성검사 목록"
+                itemTitle="적성검사"
+                name="aptitude"
+                values={values}
+                methods={methods}
+              />
+            </div>
+          )}
         </form>
       </FormProvider>
+
+      {isAnalyzed && (
+        <div className="flex justify-end">
+          <Button
+            variant={"default"}
+            size={"large"}
+            onClick={handleReset}
+            className="w-[384px]"
+          >
+            다시 선택하기
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
