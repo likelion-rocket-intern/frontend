@@ -16,9 +16,9 @@ export default function DashboardHeader() {
       <section className="flex gap-[70px]">
         <Link href={paths.root} className="flex items-center">
           <SvgColor
-            src="/logo/logo_likelion_primary_24_ver3_color.svg"
-            width={234}
-            height={26}
+            src="/logo/tech_fit.svg"
+            width={180}
+            height={48}
             className="text-primary-500"
           />
         </Link>
