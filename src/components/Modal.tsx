@@ -30,7 +30,6 @@ export default function Modal({
 }: ModalProps) {
   // 이력서 분석 실패시 이력서 재업로드
   const handleReupload = () => {
-    console.log("clicked");
     onClose();
     handleFileUpload();
   };
@@ -71,7 +70,7 @@ export default function Modal({
                 <XMarkIcon className="w-5 h-5" />
               </button>
               <div className="flex flex-col gap-8 items-center mx-[156px] my-[146px] w-[588px] h-[308px]">
-                <div className="shrink-0 size-[236px] bg-gray-300">{image}</div>
+                <div className="flex justify-center items-center mb-4">{image}</div>
                 {/* 타이틀 */}
                 <div className="flex flex-col justify-between items-center mb-4">
                   <DialogTitle

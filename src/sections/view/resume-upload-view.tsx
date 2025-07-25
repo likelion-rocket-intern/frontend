@@ -4,7 +4,7 @@ import { z as zod } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { SvgColor } from "@/components/svg-color";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import clsx from "clsx";
 import Modal from "@/components/Modal";
 import { getTaskStatus, startAnalysis } from "@/app/lib/client";
@@ -45,13 +46,16 @@ const ResumeUploadSchema = zod.object({
 
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const [task_id, setTask_id] = useState<string>("");
   const router = useRouter();
   const [shouldPoll, setShouldPoll] = useState<boolean>(true);
   const [taskStatusMessage, setTaskStatusMessage] = useState<string>("");
+  const [modalImageContent, setModalImageContent] =
+    useState<React.ReactNode>(null);
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [mockStatus, setMockStatus] = useState<StatusKey | null>(null); // 디버그용 상태
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -72,7 +76,7 @@ export default function ResumeUploadView() {
     defaultValues,
   });
 
-  const { reset, watch, setValue, handleSubmit, getValues } = methods;
+  const { watch } = methods;
 
   const values = watch();
   const manualResume = values.manualResume;
@@ -97,14 +101,63 @@ export default function ResumeUploadView() {
   const { data: taskStatus } = useQuery<TaskStatusResponse>({
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
-    enabled: !!task_id && shouldPoll, // taskId가 있고 폴링이 필요할 때만 실행
+    enabled: !!task_id && shouldPoll && !mockStatus, // taskId가 있고, 폴링이 필요하고, mockStatus가 없을 때만 실행
     refetchInterval: 1000, // 1초마다 폴링
   });
 
   // task status 상태관리 및 폴링 제어
   useEffect(() => {
     if (!taskStatus) return;
-    // 상태 설정
+
+    let mainImageSrc = "";
+    let progressImageSrc = "";
+
+    switch (taskStatus.status) {
+      case "pending":
+      case "processing":
+        mainImageSrc = "/images/home_jinro.svg";
+        progressImageSrc = "/images/resume_step_1.svg";
+        break;
+      case "parsing":
+      case "chunking":
+        mainImageSrc = "/images/home_resume.svg";
+        progressImageSrc = "/images/resume_step_2.svg";
+        break;
+      case "saving":
+      case "scoring":
+        mainImageSrc = "/images/glasses_resume.svg";
+        progressImageSrc = "/images/resume_step_3.svg";
+        break;
+      case "completed":
+        mainImageSrc = "/images/complete_resume.svg";
+        progressImageSrc = "/images/resume_step_4.svg";
+        break;
+      default:
+        break;
+    }
+
+    if (mainImageSrc) {
+      setModalImageContent(
+        <div className="flex flex-col items-center gap-8">
+          <Image
+            src={mainImageSrc}
+            alt="상태 이미지"
+            width={236}
+            height={236}
+          />
+          {progressImageSrc && (
+            <Image
+              src={progressImageSrc}
+              alt="진행 상태"
+              width={588}
+              height={48}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // 상태 메시지 설정
     setTaskStatusMessage(
       TASK_STATUS_MESSAGE[taskStatus.status as StatusKey] ??
         "이력서 상태를 가져올 수 없습니다. 다시 시도해주세요."
@@ -132,7 +185,67 @@ export default function ResumeUploadView() {
         );
       }
     }
-  }, [taskStatus, router]);
+  }, [taskStatus, router, queryClient]);
+
+  // 디버그용: mockStatus가 변경될 때 UI 업데이트
+  useEffect(() => {
+    if (!mockStatus) return;
+
+    let mainImageSrc = "";
+    let progressImageSrc = "";
+
+    switch (mockStatus) {
+      case "pending":
+      case "processing":
+        mainImageSrc = "/images/home_jinro.svg";
+        progressImageSrc = "/images/resume_step_1.svg";
+        break;
+      case "parsing":
+      case "chunking":
+        mainImageSrc = "/images/home_resume.svg";
+        progressImageSrc = "/images/resume_step_2.svg";
+        break;
+      case "saving":
+      case "scoring":
+        mainImageSrc = "/images/glasses_resume.svg";
+        progressImageSrc = "/images/resume_step_3.svg";
+        break;
+      case "completed":
+        mainImageSrc = "/images/complete_resume.svg";
+        progressImageSrc = "/images/resume_step_4.svg";
+        break;
+      case "failed":
+        mainImageSrc = "/images/failed_resume.svg";
+        progressImageSrc = ""; // 실패 시 프로그레스 바 없음
+        break;
+      default:
+        break;
+    }
+
+    if (mainImageSrc) {
+      setModalImageContent(
+        <div className="flex flex-col items-center gap-8">
+          <Image
+            src={mainImageSrc}
+            alt="상태 이미지"
+            width={236}
+            height={236}
+          />
+          {progressImageSrc && (
+            <Image
+              src={progressImageSrc}
+              alt="진행 상태"
+              width={588}
+              height={48}
+            />
+          )}
+        </div>
+      );
+    }
+
+    setTaskStatusMessage(TASK_STATUS_MESSAGE[mockStatus] || "");
+    setIsModalOpen(true); // 상태 변경 시 모달 열기
+  }, [mockStatus]);
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
@@ -268,9 +381,33 @@ export default function ResumeUploadView() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={taskStatusMessage}
-        image={<p>이미지</p>}
+        image={modalImageContent}
         handleFileUpload={() => handleFileSelectClick()}
       />
+
+      {/* 디버그용 UI */}
+      <div className="fixed bottom-5 right-5 bg-gray-200 p-4 rounded-lg shadow-lg space-y-2">
+        <h4 className="font-bold">Debug: Set Mock Status</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {Object.keys(TASK_STATUS_MESSAGE).map((status) => (
+            <Button
+              key={status}
+              variant="default"
+              size="small"
+              onClick={() => setMockStatus(status as StatusKey)}
+            >
+              {status}
+            </Button>
+          ))}
+          <Button
+            variant="default_primary"
+            size="small"
+            onClick={() => setMockStatus(null)}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
