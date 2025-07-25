@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import mockData from './mock';
+import mockData, {mockReportData} from './mock';
 
 interface PageProps {
   params: Promise<{
@@ -132,22 +132,23 @@ export default function AptitudeReportPage({ params }: PageProps) {
   const [expandedRole, setExpandedRole] = useState<number | null>(null);
 
   useEffect(() => {
-    async function fetchReport() {
-      try {
-        const { data, error } = await (client.GET as any)(`/api/v1/jinro/${id}`, {});
+    setReport(mockReportData);
+    // async function fetchReport() {
+    //   try {
+    //     const { data, error } = await (client.GET as any)(`/api/v1/jinro/${id}`, {});
 
-        if (error) {
-          setError('결과를 불러오는데 실패했습니다');
-          return;
-        }
+    //     if (error) {
+    //       setError('결과를 불러오는데 실패했습니다');
+    //       return;
+    //     }
 
-        setReport(data);
-      } catch (err) {
-        setError('결과를 가져오는 중 오류가 발생했습니다');
-      }
-    }
+    //     setReport(data);
+    //   } catch (err) {
+    //     setError('결과를 가져오는 중 오류가 발생했습니다');
+    //   }
+    // }
 
-    fetchReport();
+    // fetchReport();
   }, [id]);
 
   useEffect(() => {
@@ -250,11 +251,11 @@ export default function AptitudeReportPage({ params }: PageProps) {
     <div className="container mx-auto py-8 space-y-8">
       {/* 추천직군 섹션 */}
       <section>
-        <h2 className="text-2xl font-bold mb-6">추천직군</h2>
+        <h2 className="title_2 text-gray-500 mb-[54px]">추천직군</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 1위 직무 이미지 */}
-          <div className="bg-gray-600 rounded-lg p-6 text-center">
-            <h3 className="text-white text-xl mb-4">
+          <div className="w-[588px] h-[510px] bg-gray-600 rounded-lg p-6 text-center py-[66.5px] px-[144px]">
+            <h3 className="title_2 mb-8 text-white">
               {selectedRole ? `${selectedRole.rank}위 직무` : '1위 직무'}
             </h3>
             <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4">
@@ -271,30 +272,31 @@ export default function AptitudeReportPage({ params }: PageProps) {
           </div>
 
           {/* 추천 직군 리스트 */}
-          <div className="bg-white rounded-lg shadow-sm min-h-[380px]">
-            <div className="p-4">
-              <h3 className="text-xl font-medium mb-2">추천직군</h3>
-              <p className="text-gray-500 text-sm">가치관 유사도 기반 추천 순위입니다.</p>
+          <div className="bg-white rounded-lg shadow-sm min-h-[380px] px-6 py-6">
+            <div className="p-4 mb-6">
+              <h3 className="body_1 text-gray-600 mb-2">추천직군</h3>
+              <p className="body_2 text-gray-500">가치관 유사도 기반 추천 순위입니다.</p>
             </div>
-            <div className="divide-y">
+            <hr className="my-6  border-[#D9D9D9]" />
+            <div className="space-y-6">
               {devRoles.map((role, index) => (
                 <div key={role.name}>
                   <div
-                    className={`flex items-center justify-between px-6 py-3 hover:bg-gray-50 cursor-pointer ${selectedRole?.name === role.name ? 'bg-gray-50' : ''
+                    className={`flex items-center justify-between px-6 py-3 cursor-pointer gap-6 ${selectedRole?.name === role.name ? '' : ''
                       }`}
                     onClick={() => {
                       setSelectedRole(role);
                       setExpandedRole(expandedRole === index ? null : index);
                     }}
                   >
-                    <div className="flex items-center gap-4">
-                      <span className={`text-xl ${index === 0 ? 'text-[#ff6b00]' :
-                        index === 1 ? 'text-[#22c55e]' :
-                          'text-[#eab308]'
+                    <div className="flex items-center gap-6">
+                      <span className={`subtitle_1 ${index === 0 ? 'text-orange-600' :
+                        index === 1 ? 'text-orange-600' :
+                          'text-orange-600'
                         }`}>
                         {index + 1}
                       </span>
-                      <span className="text-gray-900">{role.name}</span>
+                      <span className="body_1 text-gray-600">{role.name}</span>
                     </div>
                     {expandedRole === index ? (
                       <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -303,11 +305,10 @@ export default function AptitudeReportPage({ params }: PageProps) {
                     )}
                   </div>
                   <div
-                    className={`px-6 bg-gray-50 transition-all duration-300 ease-in-out ${expandedRole === index ? 'py-3 h-[90px]' : 'h-0'
+                    className={`rounded-lg px-6 bg-gray-50 transition-all duration-300 ease-in-out ${expandedRole === index ? ' h-[97px]' : 'h-0'
                       } overflow-hidden`}
                   >
-                    <h4 className="text-sm text-gray-500 mb-1">직무설명</h4>
-                    <p className="text-gray-700 text-sm line-clamp-3">{role.description}</p>
+                    <p className="text-gray-600 body_2 mx-4 my-4 line-clamp-3">{role.description}</p>
                   </div>
                 </div>
               ))}

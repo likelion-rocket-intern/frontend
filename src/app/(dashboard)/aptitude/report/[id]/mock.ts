@@ -12,6 +12,75 @@ interface MockData {
   realms: Realm[];
 }
 
+interface TestResult {
+  id: number;
+  user_id: number;
+  version: string;
+  created_at: string;
+  jinro_results: Array<{
+    id: number;
+    jinro_id: number;
+    version: number;
+    ability_development_score: number;
+    autonomy_score: number;
+    conservatism_score: number;
+    stability_score: number;
+    social_recognition_score: number;
+    social_service_score: number;
+    self_improvement_score: number;
+    creativity_score: number;
+    first_job_id: number;
+    first_job: {
+      id: number;
+      job_type: string;
+      job_name_ko: string;
+      description: string | null;
+      ability_development: number;
+      autonomy: number;
+      conservatism: number;
+      stability: number;
+      social_recognition: number;
+      social_service: number;
+      self_improvement: number;
+      creativity: number;
+    };
+    first_job_score: number;
+    second_job_id: number;
+    second_job: {
+      id: number;
+      job_type: string;
+      job_name_ko: string;
+      description: string | null;
+      ability_development: number;
+      autonomy: number;
+      conservatism: number;
+      stability: number;
+      social_recognition: number;
+      social_service: number;
+      self_improvement: number;
+      creativity: number;
+    };
+    second_job_score: number;
+    third_job_id: number;
+    third_job: {
+      id: number;
+      job_type: string;
+      job_name_ko: string;
+      description: string | null;
+      ability_development: number;
+      autonomy: number;
+      conservatism: number;
+      stability: number;
+      social_recognition: number;
+      social_service: number;
+      self_improvement: number;
+      creativity: number;
+    };
+    third_job_score: number;
+    created_at: string;
+  }>;
+}
+
 const mockData: MockData = {
   "realms": [
     {
@@ -89,4 +158,77 @@ const mockData: MockData = {
   ]
 };
 
+
+const mockReportData: TestResult  = {
+  id: 1,
+  user_id: 123,
+  version: "1.0",
+  created_at: "2025-07-25T15:00:00Z",
+  jinro_results: [
+    {
+      id: 11,
+      jinro_id: 1,
+      version: 1,
+      ability_development_score: 5,
+      autonomy_score: 4,
+      conservatism_score: 3,
+      stability_score: 4,
+      social_recognition_score: 4,
+      social_service_score: 2,
+      self_improvement_score: 3,
+      creativity_score: 3,
+      first_job_id: 101,
+      first_job: {
+        id: 101,
+        job_type: "app_developer",
+        job_name_ko: "소프트웨어 엔지니어",
+        description: "창의적인 문제 해결 능력과 최신 기술 스택을 활용하여 웹 및 모바일 애플리케이션을 설계, 개발 및 유지보수합니다. 사용자 경험을 최적화하고 확장 가능한 시스템을 구축하는 역할을 담당합니다.",
+        ability_development: 5,
+        autonomy: 4,
+        conservatism: 3,
+        stability: 4,
+        social_recognition: 4,
+        social_service: 2,
+        self_improvement: 5,
+        creativity: 4
+      },
+      first_job_score: 0.95,
+      second_job_id: 102,
+      second_job: {
+        id: 102,
+        job_type: "data_analyst",
+        job_name_ko: "데이터 분석가",
+        description: "대규모 데이터에서 인사이트를 추출하고 비즈니스 의사결정을 지원하기 위해 데이터를 수집, 처리, 분석합니다. 통계적 지식과 프로그래밍 기술을 사용하여 데이터 기반의 전략을 제시합니다.",
+        ability_development: 4,
+        autonomy: 3,
+        conservatism: 4,
+        stability: 4,
+        social_recognition: 4,
+        social_service: 2,
+        self_improvement: 4,
+        creativity: 3
+      },
+      second_job_score: 0.88,
+      third_job_id: 103,
+      third_job: {
+        id: 103,
+        job_type: "project_manager",
+        job_name_ko: "프로젝트 관리자",
+        description: "프로젝트의 목표를 성공적으로 달성하기 위해 계획, 실행, 모니터링 및 마무리를 총괄합니다. 팀원들과의 원활한 소통을 통해 리소스를 효율적으로 관리하고 일정 및 예산을 준수합니다.",
+        ability_development: 4,
+        autonomy: 4,
+        conservatism: 3,
+        stability: 4,
+        social_recognition: 5,
+        social_service: 3,
+        self_improvement: 4,
+        creativity: 2
+      },
+      third_job_score: 0.82,
+      created_at: "2025-07-25T15:30:00Z"
+    }
+  ]
+};
+
 export default mockData;
+export {mockReportData}
