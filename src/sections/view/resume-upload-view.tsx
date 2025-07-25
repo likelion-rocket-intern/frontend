@@ -46,7 +46,7 @@ const ResumeUploadSchema = zod.object({
 
 export default function ResumeUploadView() {
   const fileInputRef = useRef<HTMLInputElement>(null); // 파일 input 참조
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [task_id, setTask_id] = useState<string>("");
   const router = useRouter();
   const [shouldPoll, setShouldPoll] = useState<boolean>(true);
