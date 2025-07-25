@@ -24,7 +24,7 @@ export default function SplitCard({
   cardIconSrc,
 }: SplitCardProps) {
   return (
-    <Card className="relative flex flex-col items-center justify-end w-[588px] h-[632px] px-[78px] py-[60px] bg-white border border-orange-500 shadow-lg overflow-hidden">
+    <Card className="relative flex flex-col items-center justify-end w-[588px] h-[632px] px-[78px] py-[60px] bg-white border border-primary-500 shadow-lg overflow-hidden">
       {/* 아이콘 아래쪽 사각형 배경 */}
       <div className="absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-[#FFF8F3] via-[#FFF8F3] to-transparent opacity-95"></div>
 
