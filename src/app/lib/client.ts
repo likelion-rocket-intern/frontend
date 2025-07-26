@@ -3,7 +3,8 @@ import type { paths } from "./schema";
 import { ResumeUploadSchemaType } from "@/sections/view/resume-upload-view";
 import type { components } from "./schema";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://192.168.56.109:8000";
+// 나중에 http://192.168.56.109:8000로 바꾸셈
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const client = createClient<paths>({
   baseUrl,
