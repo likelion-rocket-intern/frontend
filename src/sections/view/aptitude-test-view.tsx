@@ -180,7 +180,7 @@ export default function AptitudeTestView() {
           return (
             <Card
               key={q.qitemNo}
-              className="p-6 w-[1200px] h-[222px] border border-[#F5F5F5]"
+              className="p-6 w-[1200px] h-[222px] border border-[#F5F5F5] shadow-sm"
             >
               <div className="mb-4">
                 <h3 className="flex items-center pl-18">
@@ -207,7 +207,7 @@ export default function AptitudeTestView() {
                 {/* First Choice */}
                 <Card
                   className={cn(
-                    "flex-1 p-4 flex items-center cursor-pointer min-w-[486px] max-w-[486px] min-h-[92px] max-h-[92px] border",
+                    "flex-1 p-4 flex items-center cursor-pointer min-w-[486px] max-w-[486px] min-h-[92px] max-h-[92px] border shadow-sm",
                     selected === q.answerScore01
                       ? "bg-[#FFF1E7] border-[#FF9240]"
                       : "bg-[#FBFBFB] border-[#F5F5F5]"
@@ -248,7 +248,7 @@ export default function AptitudeTestView() {
                 {/* Second Choice */}
                 <Card
                   className={cn(
-                    "flex-1 p-4 flex items-center cursor-pointer min-w-[486px] max-w-[486px] min-h-[92px] max-h-[92px] border",
+                    "flex-1 p-4 flex items-center cursor-pointer min-w-[486px] max-w-[486px] min-h-[92px] max-h-[92px] border shadow-sm",
                     selected === q.answerScore02
                       ? "bg-[#FFF1E7] border-[#FF9240]"
                       : "bg-[#FBFBFB] border-[#F5F5F5]"
