@@ -471,11 +471,7 @@ export default function AptitudeTestView() {
                 key={index}
                 className={cn(
                   "rounded-full",
-                  index + 1 === currentPage
-                    ? "bg-[#FF9240]"
-                    : index + 1 < currentPage
-                    ? "bg-[#FFB366]"
-                    : "bg-[#E5E5E5]"
+                  index + 1 === currentPage ? "bg-[#FF9240]" : "bg-[#E5E5E5]"
                 )}
                 style={{
                   width: "180px",
