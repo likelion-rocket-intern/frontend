@@ -157,6 +157,10 @@ body {
     Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+.radio-orange-dot {
+  accent-color: #ff9240; /* 주황색 */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
