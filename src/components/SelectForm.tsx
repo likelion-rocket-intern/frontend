@@ -89,6 +89,7 @@ export default function SelectForm({
                     />
                     <Button
                       variant={"outline_primary"}
+                      type="button"
                       onClick={() => handleNavigate(item.id)}
                     >
                       분석 결과 보기
