@@ -262,21 +262,10 @@ export default function ResumeReportView() {
       {/* 이력서 요약 */}
       <section className="space-y-8">
         <h2 className="title_2 text-gray-500">이력서</h2>
-        <div className="flex gap-6">
-          {/* 프로필 */}
-          <article className="w-45 flex flex-col gap-4">
-            <div className="size-38 bg-gray-300"></div>
-            <div>
-              <h3 className="title_1 text-gray-500 mb-1">
-                {currentUser?.nickname}
-              </h3>
-              <p className="body_2 text-gray-400">
-                {currentUser?.email
-                  ? currentUser?.email
-                  : "등록된 이메일이 없습니다."}
-              </p>
-            </div>
-          </article>
+        <div className="space-y-6">
+          <h3 className="title_1 text-gray-500 mb-1">
+            {currentUser?.nickname}
+          </h3>
 
           {/* 요약 */}
           <div className="flex flex-col gap-6 justify-center items-center w-full p-6 rounded-[10px] border border-gray-200 shadow-shadow-2 bg-white">
@@ -292,7 +281,7 @@ export default function ResumeReportView() {
 
             {/* 키워드 리스트 */}
             <div className="flex flex-wrap justify-center gap-3">
-              {resumeDetail?.keywords?.map((keyword, i) => (
+              {resumeDetail?.keywords?.slice(0, 6).map((keyword, i) => (
                 <span
                   key={i}
                   className="px-4 py-2 rounded-full bg-primary-100 text-gray-600 button"

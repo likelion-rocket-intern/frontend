@@ -13,6 +13,7 @@ import {
 import client from "@/app/lib/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import mockData from "./mock";
+import Image from "next/image";
 
 interface PageProps {
   params: Promise<{
@@ -297,16 +298,13 @@ export default function AptitudeReportPage({ params }: PageProps) {
             <h3 className="text-white text-xl mb-4">
               {selectedRole ? `${selectedRole.rank}위 직무` : "1위 직무"}
             </h3>
-            <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4">
-              {/* TODO: 이미지 추가 예정
+            <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4 relative">
               <Image
-                src={selectedRole ? JOB_IMAGES[selectedRole.job_type] || '/images/job-icons/default.png' : '/images/job-icons/default.png'}
+                src="/images/lion.png"
                 alt={`${selectedRole?.name || '직무'} 아이콘`}
-                width={160}
-                height={160}
-                className="w-full h-full object-contain"
+                fill
+                className="object-contain"
               />
-              */}
             </div>
           </div>
 
