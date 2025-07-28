@@ -149,6 +149,7 @@ export default function AptitudeReportPage({ params }: PageProps) {
         setReport(data);
       } catch (err) {
         setError("결과를 가져오는 중 오류가 발생했습니다");
+        console.error(err);
       }
     }
 
@@ -301,7 +302,7 @@ export default function AptitudeReportPage({ params }: PageProps) {
             <div className="w-48 h-48 mx-auto bg-[#FAF6E9] rounded-lg p-4 relative">
               <Image
                 src="/images/lion.png"
-                alt={`${selectedRole?.name || '직무'} 아이콘`}
+                alt={`${selectedRole?.name || "직무"} 아이콘`}
                 fill
                 className="object-contain"
               />
