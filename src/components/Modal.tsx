@@ -12,6 +12,8 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { TASK_STATUS_MESSAGE } from "@/constants/taskStatus";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { paths } from "@/routes/paths";
 
 type ModalProps = {
   isOpen: boolean;
@@ -30,10 +32,10 @@ export default function Modal({
 }: ModalProps) {
   // 이력서 분석 실패시 이력서 재업로드
   const handleReupload = () => {
-    console.log("clicked");
     onClose();
     handleFileUpload();
   };
+  const router = useRouter();
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -71,7 +73,9 @@ export default function Modal({
                 <XMarkIcon className="w-5 h-5" />
               </button>
               <div className="flex flex-col gap-8 items-center mx-[156px] my-[146px] w-[588px] h-[308px]">
-                <div className="shrink-0 size-[236px] bg-gray-300">{image}</div>
+                <div className="flex justify-center items-center mb-4">
+                  {image}
+                </div>
                 {/* 타이틀 */}
                 <div className="flex flex-col justify-between items-center mb-4">
                   <DialogTitle
@@ -89,6 +93,7 @@ export default function Modal({
                       <Button
                         className="w-[240px] h-12"
                         variant={"outline_primary"}
+                        onClick={() => router.push(paths.root)}
                       >
                         홈으로 가기
                       </Button>
