@@ -8,7 +8,7 @@ import SelectForm from "@/components/SelectForm";
 import { Input } from "@/components/ui/input";
 import { SvgColor } from "@/components/svg-color";
 import clsx from "clsx";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import client from "@/app/lib/client";
 import { useState } from "react";
 import AnalysisCircles from "@/components/AnalysisCircles";
@@ -117,6 +117,34 @@ export default function MypageView() {
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (formData: MypageSchemaType) => {
+      const { resume: resume_id, link: jd_url, aptitude: jinro_id } = formData;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/jd/${resume_id}/analyze`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ jd_url, resume_id, jinro_id }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Analysis failed");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log("Analysis successful:", data);
+      setIsAnalyzed(true);
+    },
+    onError: (error) => {
+      console.error("Analysis failed:", error);
+    },
+  });
+
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
     defaultValues: {
@@ -127,8 +155,7 @@ export default function MypageView() {
   const values = watch();
 
   const onSubmit = (formData: MypageSchemaType) => {
-    console.log(formData);
-    setIsAnalyzed(true);
+    mutate(formData);
   };
 
   const handleReset = () => {
@@ -250,9 +277,10 @@ export default function MypageView() {
           size={"large"}
           className="w-full"
           type="submit"
+          disabled={isPending}
         >
           <div className="flex items-center">
-            <p>채용공고와 비교하기</p>
+            <p>{isPending ? "분석 중..." : "채용공고와 비교하기"}</p>
             <SvgColor src="/icons/icon-search.svg" width={32} height={32} />
           </div>
         </Button>
