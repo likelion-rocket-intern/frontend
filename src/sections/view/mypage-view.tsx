@@ -17,6 +17,45 @@ import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
+interface Job {
+  id: number;
+  job_type: string;
+  job_name_ko: string;
+  description: string;
+  stability: number;
+  creativity: number;
+  social_service: number;
+  ability_development: number;
+  conservatism: number;
+  social_recognition: number;
+  autonomy: number;
+  self_improvement: number;
+}
+
+interface Aptitude {
+  id: number;
+  jinro_id: number;
+  version: number;
+  stability_score: number;
+  creativity_score: number;
+  social_service_score: number;
+  ability_development_score: number;
+  conservatism_score: number;
+  social_recognition_score: number;
+  autonomy_score: number;
+  self_improvement_score: number;
+  first_job_id: number;
+  first_job: Job;
+  first_job_score: number;
+  second_job_id: number;
+  second_job: Job;
+  second_job_score: number;
+  third_job_id: number;
+  third_job: Job;
+  third_job_score: number;
+  created_at: string;
+}
+
 const MypageSchema = zod.object({
   link: zod.string().min(1),
   resume: zod.number(),
@@ -56,6 +95,17 @@ export default function MypageView() {
         throw new Error("Failed to fetch resumes");
       }
       return res.data;
+    },
+  });
+
+  const { data: aptitudeData } = useQuery<Aptitude[]>({
+    queryKey: ["api", "v1", "jinro", "user"],
+    queryFn: async () => {
+      const res = await client.GET("/api/v1/jinro/user");
+      if (res.error) {
+        throw new Error("Failed to fetch aptitude data");
+      }
+      return res.data as Aptitude[];
     },
   });
 
@@ -222,7 +272,7 @@ export default function MypageView() {
         <div className="w-0.5 h-[106px] bg-gray-200"></div>
         <section className="w-[180px] flex flex-col gap-2 items-center">
           <span className="body_1">적성검사</span>
-          <span className="subtitle_1">{0}건</span>
+          <span className="subtitle_1">{aptitudeData?.length ?? 0}건</span>
         </section>
       </div>
 
@@ -335,7 +385,13 @@ export default function MypageView() {
                 name="aptitude"
                 values={values}
                 methods={methods}
-                items={[]}
+                items={
+                  aptitudeData?.map((aptitude) => ({
+                    id: aptitude.id,
+                    title: `적성검사입니다.`,
+                    created_at: aptitude.created_at,
+                  })) ?? []
+                }
               />
             </div>
           )}
