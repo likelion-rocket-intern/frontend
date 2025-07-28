@@ -83,7 +83,6 @@ export default function ResumeReportView() {
     queryKey: ["api", "v1", "resume", resume_id],
     queryFn: async () => {
       try {
-        setTimeout(() => { }, 1000);
         const { data, error } = await client.GET("/api/v1/resume/{resume_id}", {
           params: {
             path: {
@@ -297,7 +296,7 @@ export default function ResumeReportView() {
                 <span
                   key={i}
                   className="px-4 py-2 rounded-full bg-primary-100 text-gray-600 button"
-                // title={`유사 키워드: ${keyword.similar_to} (유사도: ${(keyword.similarity * 100).toFixed(1)}%)`}
+                  // title={`유사 키워드: ${keyword.similar_to} (유사도: ${(keyword.similarity * 100).toFixed(1)}%)`}
                 >
                   {keyword.keyword} ({keyword.frequency})
                 </span>

@@ -55,7 +55,7 @@ export default function ResumeUploadView() {
     useState<React.ReactNode>(null);
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [mockStatus, setMockStatus] = useState<StatusKey | null>(null); // 디버그용 상태
+  // const [mockStatus, setMockStatus] = useState<StatusKey | null>(null); // 디버그용 상태
 
   // 파일 input 클릭
   const handleFileSelectClick = () => {
@@ -101,13 +101,15 @@ export default function ResumeUploadView() {
   const { data: taskStatus } = useQuery<TaskStatusResponse>({
     queryKey: ["task-status"],
     queryFn: () => getTaskStatus(task_id!),
-    enabled: !!task_id && shouldPoll && !mockStatus, // taskId가 있고, 폴링이 필요하고, mockStatus가 없을 때만 실행
+    enabled: !!task_id && shouldPoll, // taskId가 있고, 폴링이 필요할 때만 실행
     refetchInterval: 1000, // 1초마다 폴링
   });
 
   // task status 상태관리 및 폴링 제어
   useEffect(() => {
     if (!taskStatus) return;
+
+    setIsModalOpen(true);
 
     let mainImageSrc = "";
     let progressImageSrc = "";
@@ -131,6 +133,10 @@ export default function ResumeUploadView() {
       case "completed":
         mainImageSrc = "/images/complete_resume.svg";
         progressImageSrc = "/images/resume_step_4.svg";
+        break;
+      case "failed":
+        mainImageSrc = "/images/failed_resume.svg";
+        progressImageSrc = ""; // 실패 시 프로그레스 바 없음
         break;
       default:
         break;
@@ -188,64 +194,64 @@ export default function ResumeUploadView() {
   }, [taskStatus, router, queryClient]);
 
   // 디버그용: mockStatus가 변경될 때 UI 업데이트
-  useEffect(() => {
-    if (!mockStatus) return;
+  // useEffect(() => {
+  //   if (!mockStatus) return;
 
-    let mainImageSrc = "";
-    let progressImageSrc = "";
+  //   let mainImageSrc = "";
+  //   let progressImageSrc = "";
 
-    switch (mockStatus) {
-      case "pending":
-      case "processing":
-        mainImageSrc = "/images/home_jinro.svg";
-        progressImageSrc = "/images/resume_step_1.svg";
-        break;
-      case "parsing":
-      case "chunking":
-        mainImageSrc = "/images/home_resume.svg";
-        progressImageSrc = "/images/resume_step_2.svg";
-        break;
-      case "saving":
-      case "scoring":
-        mainImageSrc = "/images/glasses_resume.svg";
-        progressImageSrc = "/images/resume_step_3.svg";
-        break;
-      case "completed":
-        mainImageSrc = "/images/complete_resume.svg";
-        progressImageSrc = "/images/resume_step_4.svg";
-        break;
-      case "failed":
-        mainImageSrc = "/images/failed_resume.svg";
-        progressImageSrc = ""; // 실패 시 프로그레스 바 없음
-        break;
-      default:
-        break;
-    }
+  //   switch (mockStatus) {
+  //     case "pending":
+  //     case "processing":
+  //       mainImageSrc = "/images/home_jinro.svg";
+  //       progressImageSrc = "/images/resume_step_1.svg";
+  //       break;
+  //     case "parsing":
+  //     case "chunking":
+  //       mainImageSrc = "/images/home_resume.svg";
+  //       progressImageSrc = "/images/resume_step_2.svg";
+  //       break;
+  //     case "saving":
+  //     case "scoring":
+  //       mainImageSrc = "/images/glasses_resume.svg";
+  //       progressImageSrc = "/images/resume_step_3.svg";
+  //       break;
+  //     case "completed":
+  //       mainImageSrc = "/images/complete_resume.svg";
+  //       progressImageSrc = "/images/resume_step_4.svg";
+  //       break;
+  //     case "failed":
+  //       mainImageSrc = "/images/failed_resume.svg";
+  //       progressImageSrc = ""; // 실패 시 프로그레스 바 없음
+  //       break;
+  //     default:
+  //       break;
+  //   }
 
-    if (mainImageSrc) {
-      setModalImageContent(
-        <div className="flex flex-col items-center gap-8">
-          <Image
-            src={mainImageSrc}
-            alt="상태 이미지"
-            width={236}
-            height={236}
-          />
-          {progressImageSrc && (
-            <Image
-              src={progressImageSrc}
-              alt="진행 상태"
-              width={588}
-              height={48}
-            />
-          )}
-        </div>
-      );
-    }
+  //   if (mainImageSrc) {
+  //     setModalImageContent(
+  //       <div className="flex flex-col items-center gap-8">
+  //         <Image
+  //           src={mainImageSrc}
+  //           alt="상태 이미지"
+  //           width={236}
+  //           height={236}
+  //         />
+  //         {progressImageSrc && (
+  //           <Image
+  //             src={progressImageSrc}
+  //             alt="진행 상태"
+  //             width={588}
+  //             height={48}
+  //           />
+  //         )}
+  //       </div>
+  //     );
+  //   }
 
-    setTaskStatusMessage(TASK_STATUS_MESSAGE[mockStatus] || "");
-    setIsModalOpen(true); // 상태 변경 시 모달 열기
-  }, [mockStatus]);
+  //   setTaskStatusMessage(TASK_STATUS_MESSAGE[mockStatus] || "");
+  //   setIsModalOpen(true); // 상태 변경 시 모달 열기
+  // }, [mockStatus]);
 
   // 폼 제출시 실행할 함수
   const onSubmit = async (formData: ResumeUploadSchemaType) => {
@@ -386,7 +392,7 @@ export default function ResumeUploadView() {
       />
 
       {/* 디버그용 UI */}
-      <div className="fixed bottom-5 right-5 bg-gray-200 p-4 rounded-lg shadow-lg space-y-2">
+      {/* <div className="fixed bottom-5 right-5 bg-gray-200 p-4 rounded-lg shadow-lg space-y-2">
         <h4 className="font-bold">Debug: Set Mock Status</h4>
         <div className="grid grid-cols-2 gap-2">
           {Object.keys(TASK_STATUS_MESSAGE).map((status) => (
@@ -407,7 +413,7 @@ export default function ResumeUploadView() {
             Reset
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
