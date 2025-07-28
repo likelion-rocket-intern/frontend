@@ -66,19 +66,6 @@ function KakaoLoginButton() {
 
 // 메인 로그인 페이지 컴포넌트
 export default function LoginPageView() {
-  useEffect(() => {
-    client
-      .GET("/api/v1/auth/me", {})
-      .then(({ data }) => {
-        if (data) {
-          window.location.href = "/";
-        }
-      })
-      .catch((err) => {
-        console.log("Not logged in:", err);
-      });
-  }, []);
-
   return (
     <div className="flex items-center justify-center">
       <div className="w-[588px] rounded-[20px] bg-gray-25 pt-[72px] px-[102px] pb-[115px] flex flex-col items-center border border-gray-[200px] shadow-[0_4px_20px_0_rgba(0,0,0,0.04)]">
