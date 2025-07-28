@@ -1,8 +1,17 @@
-# TechFit Frontend: AI 이력서 평가 및 적성 검사 시스템
+<div align="center">
+	<img width="25%" alt="tech_fit_logo" src="https://github.com/user-attachments/assets/e527c1c5-80f9-4956-94c8-bf60ba5cedc9">
 
-TechFit 프로젝트의 프론트엔드 저장소입니다. AI 기반의 이력서 분석, 적성 검사, 그리고 채용 공고와의 비교 분석을 통해 사용자의 커리어 설계를 돕는 웹 애플리케이션을 제공합니다.
+# TechFit
 
-[![Repository](https://img.shields.io/badge/Repository-%23121011.svg?style=flat&logo=github&logoColor=white)](https://github.com/likelion-rocket-intern/frontend)
+> AI 이력서 평가 및 적성 검사 시스템
+
+수강생의 이력서를 AI가 분석하여 역량 기반 정량 평가 및 인사담당자의 성향에 맞는 인재 추천 서비스
+
+[<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logoColor=white" />](https://github.com/likelion-rocket-intern/frontend/blob/main/README.md) [![Repository](https://img.shields.io/badge/Repository-%23121011.svg?style=flat&logo=github&logoColor=white)](https://github.com/likelion-rocket-intern/frontend)
+
+<img width="100%" alt="image" src="https://github.com/user-attachments/assets/a05b918c-e1e2-4394-bd59-fb24b9bc277f" />
+
+</div>
 
 ## 서비스 바로가기
 
