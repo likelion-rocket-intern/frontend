@@ -306,6 +306,7 @@ export default function AptitudeReportPage({ params }: PageProps) {
                 className="object-contain"
               />
             </div>
+            <p className="text-white text-lg mt-4">{devRoles[0]?.name}</p>
           </div>
 
           {/* 추천 직군 리스트 */}
