@@ -6,6 +6,7 @@ import { MypageSchemaType } from "@/sections/view/mypage-view";
 import FormControl from "@mui/material/FormControl";
 import { Label } from "@radix-ui/react-label";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { UseFormReturn } from "react-hook-form";
 
 interface SelectFormProps {
@@ -23,6 +24,12 @@ export default function SelectForm({
   name,
   items,
 }: SelectFormProps) {
+  const router = useRouter();
+
+  const handleNavigate = (id: number) => {
+    router.push(`/${name}/report/${id}`);
+  };
+
   return (
     <section className="relative flex-1 flex flex-col gap-4">
       <div className="flex justify-between border-b-2 border-[#D9D9D9] pb-4 px-2">
@@ -80,7 +87,12 @@ export default function SelectForm({
                       src="/icons/icon-more-vertical.svg"
                       className="text-[#767676]"
                     />
-                    <Button variant={"outline_primary"}>결과불러오기</Button>
+                    <Button
+                      variant={"outline_primary"}
+                      onClick={() => handleNavigate(item.id)}
+                    >
+                      분석 결과 보기
+                    </Button>
                   </div>
                 </Label>
               );
