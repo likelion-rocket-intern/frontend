@@ -3,42 +3,29 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  console.log("--- Middleware Start ---");
-  console.log("Request Path:", request.nextUrl.pathname);
-
-  const cookieHeader = request.headers.get("cookie") || "";
-  console.log("Cookie Header:", cookieHeader);
-
-  const token = cookieHeader
-    .split(";")
-    .find((c) => c.trim().startsWith("access_token="))
-    ?.split("=")[1];
-  console.log("Access Token:", token);
+  const token = request.cookies.get("access_token");
 
   const isLoggedIn = !!token;
-  console.log("Is Logged In:", isLoggedIn);
-
   const isAuthPage = request.nextUrl.pathname === paths.auth.login;
-  console.log("Is Auth Page:", isAuthPage);
 
-  // 비로그인인데 로그인 페이지가 아니면
+  // 비로그인 상태에서 로그인 페이지가 아닌 다른 페이지에 접근하려고 할 때
   if (!isLoggedIn && !isAuthPage) {
-    console.log("Redirecting to login page...");
+    // 로그인 페이지로 리디렉션합니다.
     return NextResponse.redirect(new URL(paths.auth.login, request.url));
   }
 
-  // 로그인했는데 로그인 페이지 들어오면
+  // 로그인 상태에서 로그인 페이지에 접근하려고 할 때
   if (isLoggedIn && isAuthPage) {
-    console.log("Redirecting to root page...");
+    // 메인 페이지로 리디렉션합니다.
     return NextResponse.redirect(new URL(paths.root, request.url));
   }
 
-  console.log("--- Middleware End ---");
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
+    // API, Next.js 내부 파일, 정적 파일을 제외한 모든 경로에서 미들웨어를 실행합니다.
     "/((?!api|_next|favicon.ico|.*\.(?:png|jpg|jpeg|svg|webp|ico)).*)",
   ],
 };
