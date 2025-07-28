@@ -105,7 +105,9 @@ export default function MypageView() {
     queryKey: ["api", "v1", "jinro", "user"],
     queryFn: async () => {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/jinro/user`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/v1/jinro/user`,
         {
           credentials: "include",
         }
@@ -122,7 +124,9 @@ export default function MypageView() {
     mutationFn: async (formData: MypageSchemaType) => {
       const { resume: resume_id, link: jd_url, aptitude: jinro_id } = formData;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/jd/${resume_id}/analyze`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/v1/jd/${resume_id}/analyze`,
         {
           method: "POST",
           headers: {
@@ -306,7 +310,7 @@ export default function MypageView() {
           <span className="body_2">
             {userData?.email ? userData?.email : "등록된 이메일이 없습니다."}
           </span>
-          <div className="flex items-center justify-center text-gray-400">
+          <div className="flex items-center justify-start text-gray-400">
             <Button
               variant={"link_default"}
               className="px-4 py-2 caption_1"
