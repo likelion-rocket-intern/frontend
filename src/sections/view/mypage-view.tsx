@@ -10,7 +10,7 @@ import { SvgColor } from "@/components/svg-color";
 import clsx from "clsx";
 import { useQuery } from "@tanstack/react-query";
 import client from "@/app/lib/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AnalysisCircles from "@/components/AnalysisCircles";
 import KeywordCloud from "@/components/KeywordCloud";
 import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
@@ -103,16 +103,19 @@ export default function MypageView() {
   const { data: aptitudeData } = useQuery<Aptitude[]>({
     queryKey: ["api", "v1", "jinro", "user"],
     queryFn: async () => {
-      const res = await client.GET("/api/v1/jinro/user");
-      if (res.error) {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/jinro/user`,
+        {
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
         throw new Error("Failed to fetch aptitude data");
       }
-      return res.data as Aptitude[];
+      const data = await response.json();
+      return data as Aptitude[];
     },
   });
-  useEffect(() => {
-    console.log(aptitudeData);
-  }, [aptitudeData]);
 
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
