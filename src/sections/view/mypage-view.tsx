@@ -10,7 +10,7 @@ import { SvgColor } from "@/components/svg-color";
 import clsx from "clsx";
 import { useQuery } from "@tanstack/react-query";
 import client from "@/app/lib/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AnalysisCircles from "@/components/AnalysisCircles";
 import KeywordCloud from "@/components/KeywordCloud";
 import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
@@ -85,7 +85,6 @@ export default function MypageView() {
       return res.data;
     },
   });
-  console.log(userData);
 
   const { data: resumeData } = useQuery({
     queryKey: ["api", "v1", "resume"],
@@ -108,6 +107,9 @@ export default function MypageView() {
       return res.data as Aptitude[];
     },
   });
+  useEffect(() => {
+    console.log(aptitudeData);
+  }, [aptitudeData]);
 
   const methods = useForm<MypageSchemaType>({
     resolver: zodResolver(MypageSchema),
