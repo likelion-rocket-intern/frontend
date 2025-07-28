@@ -15,6 +15,7 @@ import AnalysisCircles from "@/components/AnalysisCircles";
 import KeywordCloud from "@/components/KeywordCloud";
 import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
@@ -292,7 +293,14 @@ export default function MypageView() {
     <div>
       {/* 프로필 섹션 */}
       <div className="bg-[#F5F5F5] flex items-center justify-center px-8 py-6 rounded-2xl space-x-6 mb-20 text-gray-500">
-        <div className="size-[112px] bg-white rounded-full"></div>
+        <div className="relative size-[112px] bg-white rounded-full">
+          <Image
+            src="/logo/favicon.png"
+            alt="profile"
+            fill
+            className="rounded-full"
+          />
+        </div>
         <section className="flex flex-col gap-2 w-[318px]">
           <span className="title_1">{userData?.nickname}</span>
           <span className="body_2">

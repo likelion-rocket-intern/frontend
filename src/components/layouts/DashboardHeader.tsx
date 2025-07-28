@@ -3,6 +3,7 @@
 import { SvgColor } from "@/components/svg-color";
 import { Button } from "@/components/ui/button";
 import { paths } from "@/routes/paths";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -45,10 +46,15 @@ export default function DashboardHeader() {
       {/* right section */}
       <section className="flex items-center gap-6">
         {pathname !== "/login" && (
-          <Link
-            href={paths.mypage}
-            className="size-7 rounded-full bg-slate-300"
-          ></Link>
+          <Link href={paths.mypage}>
+            <Image
+              src="/logo/favicon.png"
+              alt="profile"
+              width={28}
+              height={28}
+              className="rounded-full"
+            />
+          </Link>
         )}
       </section>
     </header>
