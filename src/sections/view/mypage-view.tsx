@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import AnalysisCircles from "@/components/AnalysisCircles";
 import KeywordCloud from "@/components/KeywordCloud";
 import { mockCompanyKeywords, mockMyKeywords } from "@/__mock__/keywords";
+import { useRouter } from "next/navigation";
 
 export type MypageSchemaType = zod.infer<typeof MypageSchema>;
 
@@ -75,6 +76,8 @@ const preAnalysisKeywords: string[] = [
 
 export default function MypageView() {
   const [isAnalyzed, setIsAnalyzed] = useState(false);
+  const router = useRouter();
+
   const { data: userData } = useQuery({
     queryKey: ["api", "v1", "auth", "me"],
     queryFn: async () => {
@@ -128,6 +131,16 @@ export default function MypageView() {
   const handleReset = () => {
     setIsAnalyzed(false);
     reset();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await client.GET("/api/v1/auth/logout");
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      router.push("/login");
+    }
   };
 
   const renderCenterCircleContent = () => {
@@ -254,13 +267,13 @@ export default function MypageView() {
           <span className="body_2">
             {userData?.email ? userData?.email : "등록된 이메일이 없습니다."}
           </span>
-          <div className="flex items-center text-gray-400">
-            <Button variant={"link_default"} className="px-4 py-2 caption_1">
+          <div className="flex items-center justify-center text-gray-400">
+            <Button
+              variant={"link_default"}
+              className="px-4 py-2 caption_1"
+              onClick={handleLogout}
+            >
               로그아웃
-            </Button>
-            <div className="w-[1px] h-6 bg-[#D9D9D9] mx-4"></div>
-            <Button variant={"link_default"} className="px-4 py-2 caption_1">
-              회원탈퇴
             </Button>
           </div>
         </section>
