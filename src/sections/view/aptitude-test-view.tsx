@@ -246,16 +246,7 @@ export default function AptitudeTestView() {
       `}</style>
 
       <div className="w-[1200px] mx-auto mb-8 pl-2">
-        <h1
-          className="font-semibold"
-          style={{ fontSize: "32px", color: "#404040" }}
-        >
-          직업 가치관 검사
-        </h1>
-        <p className="mt-4 text-base text-[#767676] text-[16px]">
-          직업과 관련된 두 개의 가치 중에서 자기에게 더 중요한 가치를 선택해
-          주세요.
-        </p>
+        <h1 className="title_2 text-gray-600">직업 가치관 검사</h1>
       </div>
 
       <div className="space-y-6 flex flex-col items-center">
@@ -280,19 +271,17 @@ export default function AptitudeTestView() {
                 <h3 className="flex items-center pl-18">
                   <span
                     className={cn(
-                      "text-2xl font-semibold mr-2",
-                      isUnanswered ? "text-[#FF6161]" : "text-[#505050]"
+                      "title_2 text-gray-600 mr-2",
+                      isUnanswered ? "text-[#FF6161]" : ""
                     )}
-                    style={{ fontSize: "32px" }}
                   >
                     {String(q.qitemNo).padStart(2, "0")}.
                   </span>{" "}
                   <span
                     className={cn(
-                      "text-base",
-                      isUnanswered ? "text-[#FF6161]" : "text-[#767676]"
+                      "title_3 text-gray-500",
+                      isUnanswered ? "text-[#FF6161]" : ""
                     )}
-                    style={{ fontSize: "28px" }}
                   >
                     {q.question}
                   </span>
@@ -335,8 +324,8 @@ export default function AptitudeTestView() {
                       <div className="flex flex-col">
                         <span
                           className={cn(
-                            "font-bold text-[24px] mb-3",
-                            isUnanswered ? "text-[#FF6161]" : "text-[#404040]"
+                            "button_3 text-gray-700 mb-3",
+                            isUnanswered ? "text-[#FF6161]" : ""
                           )}
                         >
                           {q.answer01}
@@ -344,8 +333,8 @@ export default function AptitudeTestView() {
                         {q.answer03 && (
                           <span
                             className={cn(
-                              "text-[16px]",
-                              isUnanswered ? "text-[#FF6161]" : "text-[#767676]"
+                              "body_2 text-gray-500",
+                              isUnanswered ? "text-[#FF6161]" : ""
                             )}
                           >
                             {q.answer03}
@@ -387,8 +376,8 @@ export default function AptitudeTestView() {
                       <div className="flex flex-col">
                         <span
                           className={cn(
-                            "font-bold text-[24px] mb-3",
-                            isUnanswered ? "text-[#FF6161]" : "text-[#404040]"
+                            "button_3 text-gray-700 mb-3",
+                            isUnanswered ? "text-[#FF6161]" : ""
                           )}
                         >
                           {q.answer02}
@@ -396,8 +385,8 @@ export default function AptitudeTestView() {
                         {q.answer04 && (
                           <span
                             className={cn(
-                              "text-[16px]",
-                              isUnanswered ? "text-[#FF6161]" : "text-[#767676]"
+                              "body_2 text-gray-500",
+                              isUnanswered ? "text-[#FF6161]" : ""
                             )}
                           >
                             {q.answer04}

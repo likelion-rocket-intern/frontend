@@ -235,6 +235,14 @@ body {
   letter-spacing: -0.5px;
 }
 
+@utility button_3 {
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 33.6px */
+  letter-spacing: -0.6px;
+}
+
 @utility caption_1 {
   font-size: 14px;
   font-style: normal;
