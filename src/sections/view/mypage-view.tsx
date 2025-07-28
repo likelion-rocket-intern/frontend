@@ -46,6 +46,7 @@ export default function MypageView() {
       return res.data;
     },
   });
+  console.log(userData);
 
   const { data: resumeData } = useQuery({
     queryKey: ["api", "v1", "resume"],
