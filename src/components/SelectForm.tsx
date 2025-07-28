@@ -12,16 +12,16 @@ interface SelectFormProps {
   values: MypageSchemaType;
   methods: UseFormReturn<MypageSchemaType>;
   title: string;
-  itemTitle: string;
   name: "resume" | "aptitude";
+  items: { id: number; title: string; created_at: string }[];
 }
 
 export default function SelectForm({
   values,
   methods,
   title,
-  itemTitle,
   name,
+  items,
 }: SelectFormProps) {
   return (
     <section className="relative flex-1 flex flex-col gap-4">
@@ -41,45 +41,50 @@ export default function SelectForm({
               fieldState.invalid && "border border-error-500 bg-error-50"
             )}
           >
-            {/* 이력서 아이템 */}
-            {[1, 2, 3, 4, 5].map((item, idx) => (
-              <Label
-                key={idx}
-                className={clsx(
-                  "flex items-center justify-between px-4 py-6 rounded-2xl",
-                  field.value === idx
-                    ? "ring ring-gray-400 shadow-[0_4px_6px_0_rgba(0,0,0,0.09)]"
-                    : ""
-                )}
-              >
-                <div className="flex items-center gap-4 py-4">
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        type="radio"
-                        value={idx}
-                        checked={field.value === idx}
-                        onChange={() => field.onChange(idx)}
-                        className="size-4 peer"
-                      />
-                    </FormControl>
-                  </FormItem>
-                  <div>
-                    <p className="subtitle_1 text-[#767676]">{itemTitle}</p>
-                    <p className="label_1 text-[#D9D9D9]">
-                      분석 완료 2025.07.07
-                    </p>
+            {items.map((item) => {
+              const date = new Date(item.created_at);
+              const formattedDate = `${date.getFullYear()}. ${String(
+                date.getMonth() + 1
+              ).padStart(2, "0")}. ${String(date.getDate()).padStart(2, "0")}`;
+              return (
+                <Label
+                  key={item.id}
+                  className={clsx(
+                    "flex items-center justify-between px-4 py-6 rounded-2xl",
+                    field.value === item.id
+                      ? "ring ring-gray-400 shadow-[0_4px_6px_0_rgba(0,0,0,0.09)]"
+                      : ""
+                  )}
+                >
+                  <div className="flex items-center gap-4 py-4">
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="radio"
+                          value={item.id}
+                          checked={field.value === item.id}
+                          onChange={() => field.onChange(item.id)}
+                          className="size-4 peer"
+                        />
+                      </FormControl>
+                    </FormItem>
+                    <div>
+                      <p className="subtitle_1 text-[#767676]">{item.title}</p>
+                      <p className="label_1 text-[#D9D9D9]">
+                        분석 완료 {formattedDate}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col self-stretch justify-between items-end gap-4">
-                  <SvgColor
-                    src="/icons/icon-more-vertical.svg"
-                    className="text-[#767676]"
-                  />
-                  <Button variant={"outline_primary"}>결과불러오기</Button>
-                </div>
-              </Label>
-            ))}
+                  <div className="flex flex-col self-stretch justify-between items-end gap-4">
+                    <SvgColor
+                      src="/icons/icon-more-vertical.svg"
+                      className="text-[#767676]"
+                    />
+                    <Button variant={"outline_primary"}>결과불러오기</Button>
+                  </div>
+                </Label>
+              );
+            })}
           </div>
         )}
       />

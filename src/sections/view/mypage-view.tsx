@@ -318,17 +318,23 @@ export default function MypageView() {
             <div className="flex gap-8 mb-[72px]">
               <SelectForm
                 title="이력서 목록"
-                itemTitle="000 이력서입니다."
                 name="resume"
                 values={values}
                 methods={methods}
+                items={
+                  resumeData?.resumes.map((resume) => ({
+                    id: resume.id,
+                    title: `${resume.version} 이력서입니다.`,
+                    created_at: resume.created_at,
+                  })) ?? []
+                }
               />
               <SelectForm
                 title="적성검사 목록"
-                itemTitle="적성검사"
                 name="aptitude"
                 values={values}
                 methods={methods}
+                items={[]}
               />
             </div>
           )}
