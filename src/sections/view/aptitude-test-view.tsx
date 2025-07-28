@@ -280,7 +280,7 @@ export default function AptitudeTestView() {
                 <h3 className="flex items-center pl-18">
                   <span
                     className={cn(
-                      "text-2xl font-semibold mr-2 font-bold",
+                      "text-2xl font-semibold mr-2",
                       isUnanswered ? "text-[#FF6161]" : "text-[#505050]"
                     )}
                     style={{ fontSize: "32px" }}
