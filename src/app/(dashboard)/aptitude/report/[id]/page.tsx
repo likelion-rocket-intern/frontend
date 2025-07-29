@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -10,84 +12,47 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import client from "@/app/lib/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import mockData from "./mock";
 import Image from "next/image";
 
-interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
+interface Job {
+  id: number;
+  job_type: string;
+  job_name_ko: string;
+  description: string | null;
+  stability: number;
+  creativity: number;
+  social_service: number;
+  ability_development: number;
+  conservatism: number;
+  social_recognition: number;
+  autonomy: number;
+  self_improvement: number;
 }
 
 interface TestResult {
   id: number;
-  user_id: number;
-  version: string;
+  jinro_id: number;
+  version: number;
+  stability_score: number;
+  creativity_score: number;
+  social_service_score: number;
+  ability_development_score: number;
+  conservatism_score: number;
+  social_recognition_score: number;
+  autonomy_score: number;
+  self_improvement_score: number;
+  first_job_id: number;
+  first_job: Job;
+  first_job_score: number;
+  second_job_id: number;
+  second_job: Job;
+  second_job_score: number;
+  third_job_id: number;
+  third_job: Job;
+  third_job_score: number;
   created_at: string;
-  jinro_results: Array<{
-    id: number;
-    jinro_id: number;
-    version: number;
-    stability_score: number;
-    creativity_score: number;
-    social_service_score: number;
-    ability_development_score: number;
-    conservatism_score: number;
-    social_recognition_score: number;
-    autonomy_score: number;
-    self_improvement_score: number;
-    first_job_id: number;
-    first_job: {
-      id: number;
-      job_type: string;
-      job_name_ko: string;
-      description: string | null;
-      stability: number;
-      creativity: number;
-      social_service: number;
-      ability_development: number;
-      conservatism: number;
-      social_recognition: number;
-      autonomy: number;
-      self_improvement: number;
-    };
-    first_job_score: number;
-    second_job_id: number;
-    second_job: {
-      id: number;
-      job_type: string;
-      job_name_ko: string;
-      description: string | null;
-      stability: number;
-      creativity: number;
-      social_service: number;
-      ability_development: number;
-      conservatism: number;
-      social_recognition: number;
-      autonomy: number;
-      self_improvement: number;
-    };
-    second_job_score: number;
-    third_job_id: number;
-    third_job: {
-      id: number;
-      job_type: string;
-      job_name_ko: string;
-      description: string | null;
-      stability: number;
-      creativity: number;
-      social_service: number;
-      ability_development: number;
-      conservatism: number;
-      social_recognition: number;
-      autonomy: number;
-      self_improvement: number;
-    };
-    third_job_score: number;
-    created_at: string;
-  }>;
 }
 
 interface DevRole {
@@ -117,136 +82,139 @@ const ROLE_COLORS = {
   },
 } as const;
 
-// TODO: 이미지 추가 예정
-/*const JOB_IMAGES: { [key: string]: string } = {
-  'marketer': '/images/job-icons/marketer.png',
-  'app_developer': '/images/job-icons/app-developer.png',
-  'embedded_developer': '/images/job-icons/embedded-developer.png',
-  // 다른 직군 이미지들도 추가
-};*/
+export default function AptitudeReportPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-export default function AptitudeReportPage({ params }: PageProps) {
-  const { id } = use(params);
-  const [report, setReport] = useState<TestResult | null>(null);
   const [devRoles, setDevRoles] = useState<DevRole[]>([]);
   const [selectedRole, setSelectedRole] = useState<DevRole | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [expandedRole, setExpandedRole] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function fetchReport() {
-      try {
-        const { data, error } = await (client.GET as any)(
-          `/api/v1/jinro/${id}`,
-          {}
-        );
-
-        if (error) {
-          setError("결과를 불러오는데 실패했습니다");
-          return;
+  const {
+    data: userReports,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<TestResult[]>({
+    queryKey: ["api", "v1", "jinro", "user"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/jinro/user`,
+        {
+          credentials: "include", // 쿠키 전송을 위해 필요
         }
-
-        setReport(data);
-      } catch (err) {
-        setError("결과를 가져오는 중 오류가 발생했습니다");
-        console.error(err);
+      );
+      if (!response.ok) {
+        throw new Error("적성검사 목록을 불러오는데 실패했습니다.");
       }
-    }
+      const data = await response.json();
+      return data as TestResult[];
+    },
+  });
 
-    fetchReport();
-  }, [id]);
+  // URL 파라미터의 id와 일치하는 특정 검사 결과 찾기
+  const report = userReports?.find((r) => r.id === Number(id));
 
   useEffect(() => {
     if (report) {
-      const result = report.jinro_results[0];
       const roles: DevRole[] = [
         {
-          name: result.first_job.job_name_ko,
+          name: report.first_job.job_name_ko,
           rank: 1,
-          similarity: result.first_job_score,
-          description: result.first_job.description,
-          job_type: result.first_job.job_type,
+          similarity: report.first_job_score,
+          description: report.first_job.description,
+          job_type: report.first_job.job_type,
           characteristics: [
             {
               category: "능력발휘",
-              value: result.first_job.ability_development,
+              value: report.first_job.ability_development,
             },
-            { category: "자율성", value: result.first_job.autonomy },
-            { category: "보수", value: result.first_job.conservatism },
-            { category: "안정성", value: result.first_job.stability },
+            { category: "자율성", value: report.first_job.autonomy },
+            { category: "보수", value: report.first_job.conservatism },
+            { category: "안정성", value: report.first_job.stability },
             {
               category: "사회적 인정",
-              value: result.first_job.social_recognition,
+              value: report.first_job.social_recognition,
             },
-            { category: "사회봉사", value: result.first_job.social_service },
-            { category: "자기계발", value: result.first_job.self_improvement },
-            { category: "창의성", value: result.first_job.creativity },
+            { category: "사회봉사", value: report.first_job.social_service },
+            {
+              category: "자기계발",
+              value: report.first_job.self_improvement,
+            },
+            { category: "창의성", value: report.first_job.creativity },
           ],
         },
         {
-          name: result.second_job.job_name_ko,
+          name: report.second_job.job_name_ko,
           rank: 2,
-          similarity: result.second_job_score,
-          description: result.second_job.description,
-          job_type: result.second_job.job_type,
+          similarity: report.second_job_score,
+          description: report.second_job.description,
+          job_type: report.second_job.job_type,
           characteristics: [
             {
               category: "능력발휘",
-              value: result.second_job.ability_development,
+              value: report.second_job.ability_development,
             },
-            { category: "자율성", value: result.second_job.autonomy },
-            { category: "보수", value: result.second_job.conservatism },
-            { category: "안정성", value: result.second_job.stability },
+            { category: "자율성", value: report.second_job.autonomy },
+            { category: "보수", value: report.second_job.conservatism },
+            { category: "안정성", value: report.second_job.stability },
             {
               category: "사회적 인정",
-              value: result.second_job.social_recognition,
+              value: report.second_job.social_recognition,
             },
-            { category: "사회봉사", value: result.second_job.social_service },
-            { category: "자기계발", value: result.second_job.self_improvement },
-            { category: "창의성", value: result.second_job.creativity },
+            {
+              category: "사회봉사",
+              value: report.second_job.social_service,
+            },
+            {
+              category: "자기계발",
+              value: report.second_job.self_improvement,
+            },
+            { category: "창의성", value: report.second_job.creativity },
           ],
         },
         {
-          name: result.third_job.job_name_ko,
+          name: report.third_job.job_name_ko,
           rank: 3,
-          similarity: result.third_job_score,
-          description: result.third_job.description,
-          job_type: result.third_job.job_type,
+          similarity: report.third_job_score,
+          description: report.third_job.description,
+          job_type: report.third_job.job_type,
           characteristics: [
             {
               category: "능력발휘",
-              value: result.third_job.ability_development,
+              value: report.third_job.ability_development,
             },
-            { category: "자율성", value: result.third_job.autonomy },
-            { category: "보수", value: result.third_job.conservatism },
-            { category: "안정성", value: result.third_job.stability },
+            { category: "자율성", value: report.third_job.autonomy },
+            { category: "보수", value: report.third_job.conservatism },
+            { category: "안정성", value: report.third_job.stability },
             {
               category: "사회적 인정",
-              value: result.third_job.social_recognition,
+              value: report.third_job.social_recognition,
             },
-            { category: "사회봉사", value: result.third_job.social_service },
-            { category: "자기계발", value: result.third_job.self_improvement },
-            { category: "창의성", value: result.third_job.creativity },
+            {
+              category: "사회봉사",
+              value: report.third_job.social_service,
+            },
+            {
+              category: "자기계발",
+              value: report.third_job.self_improvement,
+            },
+            { category: "창의성", value: report.third_job.creativity },
           ],
         },
       ];
-
       setDevRoles(roles);
     }
   }, [report]);
 
-  // 기본값으로 첫 번째 직군 선택
+  // devRoles가 준비되면 첫 번째 직군을 기본 선택
   useEffect(() => {
-    if (devRoles.length > 0 && !selectedRole) {
+    if (devRoles.length > 0) {
       setSelectedRole(devRoles[0]);
     }
-  }, [devRoles, selectedRole]);
+  }, [devRoles]);
 
-  if (error) {
-    return <div className="text-red-500 p-4">{error}</div>;
-  }
-
-  if (!report) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         로딩중...
@@ -254,29 +222,48 @@ export default function AptitudeReportPage({ params }: PageProps) {
     );
   }
 
+  if (isError) {
+    return <div className="text-red-500 p-4">{error.message}</div>;
+  }
+
+  if (!report) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        해당 ID의 적성검사 결과를 찾을 수 없습니다.
+      </div>
+    );
+  }
+
   // 가치관 점수 순으로 정렬
-  const result = report.jinro_results[0];
   const sortedValues = [
     {
       code: "ability",
       name: "능력발휘",
-      score: result.ability_development_score,
+      score: report.ability_development_score,
     },
-    { code: "autonomy", name: "자율성", score: result.autonomy_score },
-    { code: "conservatism", name: "보수", score: result.conservatism_score },
-    { code: "stability", name: "안정성", score: result.stability_score },
+    { code: "autonomy", name: "자율성", score: report.autonomy_score },
+    {
+      code: "conservatism",
+      name: "보수",
+      score: report.conservatism_score,
+    },
+    { code: "stability", name: "안정성", score: report.stability_score },
     {
       code: "social",
       name: "사회적 인정",
-      score: result.social_recognition_score,
+      score: report.social_recognition_score,
     },
-    { code: "service", name: "사회봉사", score: result.social_service_score },
+    {
+      code: "service",
+      name: "사회봉사",
+      score: report.social_service_score,
+    },
     {
       code: "improvement",
       name: "자기계발",
-      score: result.self_improvement_score,
+      score: report.self_improvement_score,
     },
-    { code: "creativity", name: "창의성", score: result.creativity_score },
+    { code: "creativity", name: "창의성", score: report.creativity_score },
   ].sort((a, b) => b.score - a.score);
 
   // 레이더 차트 데이터 준비
@@ -372,8 +359,6 @@ export default function AptitudeReportPage({ params }: PageProps) {
         <h2 className="text-2xl font-bold mb-6">적성검사 결과</h2>
         <div className="bg-white rounded-lg p-6">
           <div className="w-full h-[400px]">
-            {" "}
-            {/* 높이 고정값으로 변경 */}
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={chartData}>
                 <PolarGrid />
@@ -471,10 +456,10 @@ export default function AptitudeReportPage({ params }: PageProps) {
                 key={value.code}
                 className={`border rounded-lg ${
                   index < 2
-                    ? "border-[#FFA172]" // 상위 2개는 오렌지색
+                    ? "border-[#FFA172]" // 상위 2개는 주황색
                     : index >= sortedValues.length - 2
                     ? "border-[#4A72FF]" // 하위 2개는 파란색
-                    : "border-gray-200" // 나머지는 기본 회색
+                    : "border-gray-200" // 나머지는 회색
                 }`}
               >
                 <div className="p-6">
